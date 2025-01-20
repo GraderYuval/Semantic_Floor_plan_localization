@@ -1,0 +1,24 @@
+# config.yaml
+
+dataset: "structured3d_perspective_full"
+dataset_path: "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full"
+ckpt_path: "./logs/full/10-03/"
+epochs: 100
+batch_size: 16
+lr: 0.001
+shape_loss_weight: 20
+
+# Depth net parameters
+depth_net:
+  L: 0
+  D: 128
+  d_min: 0.1
+  d_max: 15.0
+  d_hyp: -0.2
+  F_W: 3 / 5
+
+# Augmentation settings
+augmentation:
+  add_rp: True
+  roll: 0
+  pitch: 0

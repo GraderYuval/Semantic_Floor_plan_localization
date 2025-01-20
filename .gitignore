@@ -1,0 +1,20 @@
+data/
+floorplans/
+output/
+logs/
+lightning_logs/
+results/
+utils/temp_figs/
+modules/Final_wights
+laser/logs_fixed_perspective/
+laser/logs-original_paper/
+laser/logs_fixed_perspective_v2/
+laser/
+modules/top_k/
+# Ignore all __pycache__ directories recursively
+__pycache__/
+
+# Optionally, also ignore Python bytecode files (compiled Python files)
+*.pyc
+modules/Final_wights/
+.git_backup/
