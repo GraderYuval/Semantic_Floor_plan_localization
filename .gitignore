@@ -10,7 +10,7 @@ laser/logs_fixed_perspective/
 laser/logs-original_paper/
 laser/logs_fixed_perspective_v2/
 laser/
-modules/top_k/
+modules/top_k/results/
 # Ignore all __pycache__ directories recursively
 __pycache__/
 
