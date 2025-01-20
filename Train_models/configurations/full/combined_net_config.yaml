@@ -1,13 +1,13 @@
 # Paths
-dataset_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full'
+dataset_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full'
 dataset: 'structured3d_perspective_full'  # Dataset name
-depth_net_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/modules/Final_wights/depth/final_depth_model_checkpoint.ckpt'
-semantic_net_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt'
+depth_net_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/modules/Final_wights/depth/final_depth_model_checkpoint.ckpt'
+semantic_net_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt'
 
-desdf_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/desdf'
-prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/prob_vols'
+desdf_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/desdf'
+prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols'
 #-------------------------------------------------
-ckpt_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/logs/combined/expected_pose_pred'  # Base checkpoint path
+ckpt_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/combined/expected_pose_pred'  # Base checkpoint path
 #-------------------------------------------------
 #Training:
 batch_size: 8  # Due to variable map sizes

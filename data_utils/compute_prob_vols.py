@@ -88,16 +88,16 @@ def compute_and_save_prob_vols(dataset_dir, desdf_path, prob_vols_dir, start_sce
 
 if __name__ == "__main__":
     # Paths and parameters
-    dataset_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full"
-    desdf_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/desdf"
-    prob_vols_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/prob_vols"
+    dataset_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full"
+    desdf_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/desdf"
+    prob_vols_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols"
     start_scene = 0
     end_scene = 0
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load pretrained models
-    depth_checkpoint_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/logs/full/21_9_fix_depth_to_match_paper/depth/depth_net-epoch=94-loss-valid=0.47.ckpt"
-    semantic_checkpoint_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/logs/full/21_9_fix_depth_to_match_paper/semantic/semantic_net-epoch=10-loss-valid=0.26-v1.ckpt"
+    depth_checkpoint_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/full/21_9_fix_depth_to_match_paper/depth/depth_net-epoch=94-loss-valid=0.47.ckpt"
+    semantic_checkpoint_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/full/21_9_fix_depth_to_match_paper/semantic/semantic_net-epoch=10-loss-valid=0.26-v1.ckpt"
 
     depth_net = depth_net_pl.load_from_checkpoint(
         checkpoint_path=depth_checkpoint_path,

@@ -1,10 +1,10 @@
 # Train_models/configurations/full/prob_vol_path_config.yaml
 
 # Paths
-dataset_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full'
+dataset_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full'
 dataset: 'structured3d_perspective_full'  # Dataset name
-prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/prob_vols'
-ckpt_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/logs/combined/prb_vol_nets'  # Base checkpoint path
+prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols'
+ckpt_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/combined/prb_vol_nets'  # Base checkpoint path
 # DATA_SET_SIZE: 'tiny'
 # DATA_SET_SIZE: 'small'
 # DATA_SET_SIZE: 'medium'

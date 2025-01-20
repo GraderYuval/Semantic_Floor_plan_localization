@@ -41,7 +41,7 @@ def check_scene_dimensions(yaml_path, base_dir):
         print("\nNo dimension mismatches found.")
 
 if __name__ == "__main__":
-    yaml_path = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty/split.yaml'
-    base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty'
+    yaml_path = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty/split.yaml'
+    base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty'
     
     check_scene_dimensions(yaml_path, base_dir)

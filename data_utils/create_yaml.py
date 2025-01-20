@@ -31,7 +31,7 @@ yaml_content += "val:\n" + format_yaml_list(data['val']) + "\n\n"
 yaml_content += "test:\n" + format_yaml_list(data['test']) + "\n"
 
 # Write to the YAML file
-with open('/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/split.yaml', 'w') as file:
+with open('/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/split.yaml', 'w') as file:
     file.write(yaml_content)
 
 print("YAML file 'split.yaml' created successfully.")

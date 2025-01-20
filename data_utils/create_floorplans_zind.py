@@ -353,7 +353,7 @@ def main():
     # args = parse_args()
 
     # load annotations from json
-    path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/temp"
+    path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/temp"
     scene_number = "00000"
     type = "floorplan"
     with open(os.path.join(path, f"scene_{scene_number}", "annotation_3d.json")) as file:

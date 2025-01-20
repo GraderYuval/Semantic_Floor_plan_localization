@@ -70,7 +70,7 @@ def evaluate_combined_model(
         dataset_size = comb['dataset_size']
         # Load small_combined_net directly from checkpoint
         combined_nets[f"{net_size}_{dataset_size}"] = ProbVolNetPLAccOnly.load_from_checkpoint(
-            checkpoint_path=f"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/logs/combined/prb_vol_nets/combined_prob_vols_net_type-{net_size}_dataset_size-{dataset_size}_epochs-100/final_combined_model_checkpoint.ckpt",
+            checkpoint_path=f"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/combined/prb_vol_nets/combined_prob_vols_net_type-{net_size}_dataset_size-{dataset_size}_epochs-100/final_combined_model_checkpoint.ckpt",
             net_size=net_size,  
             strict=False 
         ).to(device)

@@ -389,6 +389,6 @@ def main():
 if __name__ == "__main__":
     main()
     """
-    python visualize_3d.py --path /datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data --scene 3201 --resolution 0.01 --dpi 100
+    python visualize_3d.py --path /datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data --scene 3201 --resolution 0.01 --dpi 100
     """
 

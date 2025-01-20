@@ -3,7 +3,7 @@ import shutil
 import yaml
 
 # Load the YAML file
-yaml_file = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty/split.yaml'
+yaml_file = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty/split.yaml'
 
 with open(yaml_file, 'r') as file:
     data = yaml.safe_load(file)
@@ -11,8 +11,8 @@ with open(yaml_file, 'r') as file:
 scenes = data['test']
 
 # Define the base directories
-source_base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty'
-destination_base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set/desdf'
+source_base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty'
+destination_base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set/desdf'
 
 # Ensure the destination directory exists
 os.makedirs(destination_base_dir, exist_ok=True)

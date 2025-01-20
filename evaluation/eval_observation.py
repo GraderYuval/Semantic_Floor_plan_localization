@@ -176,7 +176,7 @@ def evaluate_combined_model(
             #     plot_prob_dist(
             #     prob_dist=prob_dist_pred, 
             #     resolution=0.1, 
-            #     save_path= '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/results/temp_figs', 
+            #     save_path= '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/temp_figs', 
             #     file_name=f"{idx_within_scene}_depth-{depth_weight}_semantic-{semantic_weight}_net", 
             #     occ=maps[scene], 
             #     pose_pred=pose_pred, 
@@ -187,7 +187,7 @@ def evaluate_combined_model(
             #     )
 
     # Directory to save the plots
-    save_path = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/results/temp_figs'
+    save_path = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/temp_figs'
 
     for weight_key, dict_max_val_to_acc in all_weight_comb_dict.items():
         plot_dict_relationship(

@@ -1,12 +1,12 @@
 # evaluation/configuration/config_eval_diffusion.yaml
 
 # Paths
-dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full'
-prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/prob_vols'
-split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/split.yaml'
+dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full'
+prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols'
+split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/split.yaml'
 
 # Results directory
-results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/results/full/diffusion/single_source/semantic'
+results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/full/diffusion/single_source/semantic'
 
 # Diffusion parameters
 num_timesteps: 1000  # Number of diffusion steps
@@ -16,7 +16,7 @@ lr: 0.0001
 
 model_type: "semantic" # depth / semantic
 # Diffusion model checkpoint
-diffusion_model_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/logs/single_source_diffusion_model/single_source_diffusion__dataset_size-full_epochs-100_model_type-semantic/final_single_source_diffusion_checkpoint.ckpt' #Semantic
+diffusion_model_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/single_source_diffusion_model/single_source_diffusion__dataset_size-full_epochs-100_model_type-semantic/final_single_source_diffusion_checkpoint.ckpt' #Semantic
 add_plots: false
 number_of_scenes: 50
 

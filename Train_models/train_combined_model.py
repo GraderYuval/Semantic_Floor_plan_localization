@@ -189,7 +189,7 @@ def main():
     version = f"epochs_{config.epochs}_lr_{config.lr}"
 
     logger = TensorBoardLogger(
-        save_dir="/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/lightning_logs",           # Base directory for logs
+        save_dir="/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/lightning_logs",           # Base directory for logs
         name=experiment_name,      # Experiment name
         version=version            # Version of the experiment
     )

@@ -2,7 +2,7 @@ import os
 import tqdm
 import cv2
 
-data_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full"
+data_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full"
 # get all scene directories in the path
 scenes = [d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d)) and d.startswith('scene_')] 
 scenes.sort(key=lambda x: int(x.split('_')[-1]))

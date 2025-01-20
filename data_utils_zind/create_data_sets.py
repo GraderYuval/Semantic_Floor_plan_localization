@@ -42,9 +42,9 @@ def process_all_scenes(base_path, output_base_path, resolution=0.01, dpi=100, fo
 
 
 def main():
-    base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/zind/zind_raw"
-    # output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/zind/zind_data_set"
-    output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/zind/zind_data_set_80_fov"
+    base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind/zind_raw"
+    # output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind/zind_data_set"
+    output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind/zind_data_set_80_fov"
 
     resolution = 0.01  # Resolution in meters per pixel
     dpi = 100          # DPI for output images

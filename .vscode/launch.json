@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/data_utils/create_floorplans.py",
             "console": "integratedTerminal",
             "args": [
-                "--path", "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test",
+                "--path", "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test",
                 "--scene", "00000",
                 // "--type", "floorplan"
                 // Add more arguments as needed, like "--color", "normal"

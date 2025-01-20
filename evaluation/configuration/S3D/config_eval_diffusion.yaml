@@ -1,12 +1,12 @@
 # evaluation/configuration/config_eval_diffusion.yaml
 
 # Paths
-dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full'
-prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/prob_vols'
-split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/split.yaml'
+dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full'
+prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols'
+split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/split.yaml'
 
 # Results directory
-results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/results/full/diffusion/ddim/narrow_gt_map-true'
+results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/full/diffusion/ddim/narrow_gt_map-true'
 
 max_h: 1760
 max_w: 1760
@@ -19,7 +19,7 @@ beta_end: 0.02       # End value for beta schedule
 
 model_type: "crowed_diff" # crowed_diff / regular
 # Diffusion model checkpoint
-diffusion_model_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/logs/diffusion_model/diffusion_net_dataset_size-small_epochs-100_acc_only-True_narrow_gt_map-True_model_type-crowed_diff/final_diffusion_model_checkpoint.ckpt'
+diffusion_model_checkpoint: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/diffusion_model/diffusion_net_dataset_size-small_epochs-100_acc_only-True_narrow_gt_map-True_model_type-crowed_diff/final_diffusion_model_checkpoint.ckpt'
 model_channels: 64   # Base number of channels for thes model
 num_res_blocks: 2    # Number of residual blocks per level
 attention_resolutions: [32,16,8]  # Resolutions at which to use attention

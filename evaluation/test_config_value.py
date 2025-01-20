@@ -110,7 +110,7 @@ def evaluate_combined_model(
             return_np=False,
         )
 
-        base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/test_data_set_full/prob_vols"
+        base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols"
         depth_prob_vol_path = os.path.join(base_path, f"{scene}/camera_{idx_within_scene}_pred_depth_prob_vol.pt.gz")
         semantic_prob_vol_path = os.path.join(base_path, f"{scene}/camera_{idx_within_scene}_pred_semantic_prob_vol.pt.gz")
         

@@ -1,7 +1,7 @@
 import os
 
 # Define the directory path and the file prefixes to keep
-dir_path = r"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/structured3d_perspective_full"
+dir_path = r"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/structured3d_perspective_full"
 prefixes_to_keep = ('annotation_3d', 'camera_xyz', 'rgb_rawlight','camera_pose')
 
 # Traverse the directory tree

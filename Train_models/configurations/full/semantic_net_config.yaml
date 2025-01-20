@@ -1,6 +1,6 @@
 # config.yaml
 dataset: "zind_data_set"
-dataset_path: "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Floor_Plan_Localization/data/zind"
+dataset_path: "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind"
 ckpt_path: "./logs/zind/07_10/"
 epochs: 100
 batch_size: 16
