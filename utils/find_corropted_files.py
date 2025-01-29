@@ -1,7 +1,7 @@
 import os
 
 # Paths
-base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set/structured3d_perspective_empty'
+base_dir = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set/structured3d_perspective_empty'
 scenes_dir = base_dir
 
 # Iterate over all scenes

@@ -116,7 +116,7 @@ Meetings:
 5. 
 
 --
-du -h --max-depth=1 /datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization
+du -h --max-depth=1 /datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization
 --
 
 For map and kill proccess:

@@ -66,17 +66,17 @@ def write_yaml(split_dict, output_yaml_path):
 def main():
     # Path to partition.json. Adjust if needed.
     partition_json_path = (
-        "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind/zind_raw/partition.json"
+        "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/zind_raw/partition.json"
     )
     
     # Base directory that holds the floor directories.
     base_dir = (
-        "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind/zind_data_set_80_fov"
+        "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/zind_data_set_80_fov"
     )
     
     # Output YAML file path (as requested).
     output_yaml_path = (
-        "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data_utils_zind/split.yaml"
+        "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data_utils_zind/split.yaml"
     )
     
     # Load the partition file.

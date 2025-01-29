@@ -26,7 +26,7 @@ urls = [
 ]
 
 # Directory to save the files
-save_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/structured3d_perspective_full/"
+save_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/structured3d_perspective_full/"
 
 # Ensure the directory exists
 os.makedirs(save_dir, exist_ok=True)

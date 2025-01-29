@@ -36,12 +36,12 @@ def process_all_scenes(base_path, output_base_path, resolution=0.01, dpi=100, fo
 
 
 def main():
-    # base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/structured3d_perspective_empty/Structured3D"
-    base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/structured3d_perspective_full/Structured3D"
-    # base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/temp"
-    output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full"
-    # output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/depth_from_semantic_data_set/structured3d_perspective_empty"
-    # output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/temp_data_set"
+    # base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/structured3d_perspective_empty/Structured3D"
+    base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/structured3d_perspective_full/Structured3D"
+    # base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/temp"
+    output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full"
+    # output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/depth_from_semantic_data_set/structured3d_perspective_empty"
+    # output_base_path = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/temp_data_set"
     resolution = 0.01  # Resolution in meters per pixel
     dpi = 100          # DPI for output images
     fov_segments = 40  # Number of segments to divide the FOV into

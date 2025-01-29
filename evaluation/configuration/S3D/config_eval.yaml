@@ -1,17 +1,17 @@
 # evaluation/configuration/config.yaml
 
 # Paths
-dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full'
-desdf_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/desdf'
-log_dir_depth: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/modules/Final_wights/depth/final_depth_model_checkpoint.ckpt'
-log_dir_semantic: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt'
-split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/split.yaml'
-prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols'
+dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full'
+desdf_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/desdf'
+log_dir_depth: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/Final_wights/depth/final_depth_model_checkpoint.ckpt'
+log_dir_semantic: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt'
+split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full/split.yaml'
+prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/prob_vols'
 #------------------------------------------
-results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/full/GT'
+results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/full/GT'
 
 #------------------------------------------
-combined_prob_vols_net_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/combined/expected_pose_pred/combined_prob_vols_net_type-expected_pose_pred_net_size-6k_dataset_size-medium_epochs-99/combined_net-epoch=58-loss-valid=7.16.ckpt'
+combined_prob_vols_net_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/combined/expected_pose_pred/combined_prob_vols_net_type-expected_pose_pred_net_size-6k_dataset_size-medium_epochs-99/combined_net-epoch=58-loss-valid=7.16.ckpt'
 combined_net_size: "6k"
 
 #------------------------------------------
@@ -35,9 +35,9 @@ num_classes: 4
 
 # Evaluation parameters
 prediction_type: 'combined'  # Options: 'depth', 'semantic', 'combined', 'all'
-use_ground_truth_depth: true  # Set to true to use ground truth depth
-use_ground_truth_semantic: true  # Set to true to use ground truth semantics
-use_saved_prob_vol: true
+use_ground_truth_depth: false  # Set to true to use ground truth depth
+use_ground_truth_semantic: false  # Set to true to use ground truth semantics
+use_saved_prob_vol: false
 num_of_scenes: -1
 pad_to_max: True
 max_h: 1760
@@ -48,9 +48,9 @@ weight_combinations:
   - [1.0, 0.0]  # Only depth
   - [0, 1.0]  # Only depth
   # - [0, "semantic"]  # Only depth
-  - [0.9, 0.1]
-  - [0.8, 0.2]
-  - [0.7, 0.3]
-  - [0.6, 0.4]
+  # - [0.9, 0.1]
+  # - [0.8, 0.2]
+  # - [0.7, 0.3]
+  # - [0.6, 0.4]
   - [0.5, 0.5]
   # - [0.5, "semantic"]

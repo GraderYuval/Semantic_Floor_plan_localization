@@ -1,11 +1,11 @@
 # evaluation/configuration/config.yaml
 
 # Paths
-dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind/zind_data_set'
-desdf_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/zind/desdf'
-log_dir_depth: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/zind/08_10/depth/final_depth_model_checkpoint.ckpt'
-log_dir_semantic: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/logs/zind/08_10/semantic/semantic_net-epoch=11-loss-valid=0.34.ckpt'
-results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/full/visualizations/Zind'
+dataset_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/zind_data_set'
+desdf_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/desdf'
+log_dir_depth: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/zind/08_10/depth/final_depth_model_checkpoint.ckpt'
+log_dir_semantic: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/zind/08_10/semantic/semantic_net-epoch=11-loss-valid=0.34.ckpt'
+results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/full/visualizations/Zind'
 
 
 # Dataset parameters

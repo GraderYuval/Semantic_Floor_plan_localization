@@ -267,9 +267,9 @@ def generate_maps_and_latex(scene_dir, prob_vol_dir, save_dir, poses, num_camera
 
 # Example usage (adapt paths if needed)
 scene_name = "scene_3250"
-save_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/final_results/visualtizations/saved_maps"
-scene_dir = f"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/structured3d_perspective_full/{scene_name}"
-prob_vol_dir = f"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/data/test_data_set_full/prob_vols/{scene_name}"
+save_dir = "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/final_results/visualtizations/saved_maps"
+scene_dir = f"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full/{scene_name}"
+prob_vol_dir = f"/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/prob_vols/{scene_name}"
 poses_file = os.path.join(scene_dir, "poses.txt")
 poses = read_poses(poses_file)
 generate_maps_and_latex(scene_dir, prob_vol_dir, save_dir, poses, num_cameras=2, device='cuda' if torch.cuda.is_available() else 'cpu')

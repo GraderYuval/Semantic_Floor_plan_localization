@@ -192,7 +192,7 @@ def main():
     version = f"epochs_{config.epochs}_lr_{config.lr}"
 
     logger = TensorBoardLogger(
-        save_dir="/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/lightning_logs/Prob_Vol_Nets", 
+        save_dir="/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/lightning_logs/Prob_Vol_Nets", 
         name=experiment_name,      # Experiment name
         version=version            # Version of the experiment
     )

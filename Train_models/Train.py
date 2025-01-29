@@ -67,10 +67,10 @@ def main():
     parser.add_argument(
         "--config",
         type=str,
-        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/Train_models/configurations/full/semantic_net_config.yaml", #S3D
-        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/Train_models/configurations/full/depth_net_config.yaml", #S3D
-        default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/Train_models/configurations/zind/depth_net_config.yaml", #ZIND
-        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/Train_models/configurations/zind/semantic_net_config.yaml", #ZIND
+        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/full/semantic_net_config.yaml", #S3D
+        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/full/depth_net_config.yaml", #S3D
+        default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/zind/depth_net_config.yaml", #ZIND
+        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/zind/semantic_net_config.yaml", #ZIND
         help="Path to the config file",
     )
     args = parser.parse_args()

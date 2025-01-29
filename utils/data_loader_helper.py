@@ -9,6 +9,7 @@ def load_scene_data(test_set, dataset_dir, desdf_path):
     desdfs = {}
     semantics = {}
     maps = {}
+    walls = {}
     gt_poses = {}
     valid_scene_names = []  # To keep track of valid scenes
 
@@ -22,11 +23,14 @@ def load_scene_data(test_set, dataset_dir, desdf_path):
             
             desdf = np.load(os.path.join(desdf_path, scene, "desdf.npy"), allow_pickle=True)
             semantic = np.load(os.path.join(desdf_path, scene, "color.npy"), allow_pickle=True)
-            occ = cv2.imread(os.path.join(dataset_dir, scene, "floorplan_semantic.png"))
+            occ_sem = cv2.imread(os.path.join(dataset_dir, scene, "floorplan_semantic.png"))
+            occ_walls = cv2.imread(os.path.join(dataset_dir, scene, "floorplan_walls_only.png"))
             
             desdfs[scene] = desdf.item()
             semantics[scene] = semantic.item()
-            maps[scene] = occ
+            maps[scene] = occ_sem
+            walls[scene] = occ_walls
+
 
             with open(os.path.join(dataset_dir, scene, "poses.txt"), "r") as f:
                 poses_txt = [line.strip() for line in f.readlines()]
@@ -44,4 +48,4 @@ def load_scene_data(test_set, dataset_dir, desdf_path):
             continue
 
     # print(f"number of valid scenes for evaluation: {len(valid_scene_names)} out of: {len(test_set.scene_names)} --> {(len(valid_scene_names)/len(test_set.scene_names))*100}%")
-    return desdfs, semantics, maps, gt_poses, valid_scene_names
+    return desdfs, semantics, maps, gt_poses, valid_scene_names, walls

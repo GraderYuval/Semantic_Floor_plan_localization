@@ -173,21 +173,21 @@ def evaluate_combined_model(
             acc_orn_records_for_all_weights[weight_key].append(acc_orn)
             
             # if idx_within_scene<2:
-            #     plot_prob_dist(
-            #     prob_dist=prob_dist_pred, 
-            #     resolution=0.1, 
-            #     save_path= '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/temp_figs', 
-            #     file_name=f"{idx_within_scene}_depth-{depth_weight}_semantic-{semantic_weight}_net", 
-            #     occ=maps[scene], 
-            #     pose_pred=pose_pred, 
-            #     ref_pose_map=ref_pose_map,
-            #     plot_type="combined",
-            #     acc = acc,
-            #     acc_orn = acc_orn                
-            #     )
+            # plot_prob_dist(
+            # prob_dist=prob_dist_pred, 
+            # resolution=0.1, 
+            # save_path= '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/temp_figs', 
+            # file_name=f"{idx_within_scene}_depth-{depth_weight}_semantic-{semantic_weight}_net.png", 
+            # occ=maps[scene], 
+            # pose_pred=pose_pred, 
+            # ref_pose_map=ref_pose_map,
+            # plot_type="combined",
+            # acc = acc,
+            # acc_orn = acc_orn                
+            # )
 
     # Directory to save the plots
-    save_path = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_Plan_Localization/results/temp_figs'
+    save_path = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/temp_figs'
 
     for weight_key, dict_max_val_to_acc in all_weight_comb_dict.items():
         plot_dict_relationship(
@@ -240,6 +240,7 @@ def evaluate_observation(prediction_type, config, device):
     if config.use_saved_prob_vol:
         scene_names = split.test  # Use all test scenes
         scene_names = split.test[:config.num_of_scenes] 
+        scene_names = ['scene_03486']
         test_set = ProbVolDataset(
             dataset_dir=dataset_dir,
             scene_names=scene_names,
@@ -250,7 +251,8 @@ def evaluate_observation(prediction_type, config, device):
     else:
         test_set = GridSeqDataset(
             dataset_dir,
-            split.test[:config.num_of_scenes],
+            # split.test[:config.num_of_scenes],
+            ['scene_03486'],
             L=L,
         )
 
@@ -279,7 +281,7 @@ def evaluate_observation(prediction_type, config, device):
     os.makedirs(results_type_dir, exist_ok=True)
 
     # Load desdf, semantics, maps, and ground truth poses
-    desdfs, semantics, maps, gt_poses, valid_scene_names = load_scene_data(
+    desdfs, semantics, maps, gt_poses, valid_scene_names, _ = load_scene_data(
         test_set, dataset_dir, desdf_path
     )
 
@@ -303,8 +305,8 @@ def main():
     parser.add_argument(
         "--config_file",
         type=str,
-        # default="evaluation/configuration/S3D/config_eval.yaml",
-        default="evaluation/configuration/zind/config_eval.yaml",
+        default="evaluation/configuration/S3D/config_eval.yaml",
+        # default="evaluation/configuration/zind/config_eval.yaml",
         help="Path to the configuration file",
     )
     args = parser.parse_args()
