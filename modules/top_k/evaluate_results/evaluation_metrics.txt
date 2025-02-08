@@ -1,25 +1,11 @@
-Recalls for model (weight key 'default'):
-  1m: 35.29%
-  0.5m: 26.47%
-  0.1m: 4.90%
-  1m 30 deg: 35.29%
-Recalls for baseline (always selecting k=0):
-  1m: 50.98%
-  0.5m: 42.16%
-  0.1m: 5.56%
-  1m 30 deg: 50.98%
-Recalls for random threshold baseline (selecting randomly among top scores within 0.01):
-  1m: 43.14%
-  0.5m: 34.97%
-  0.1m: 4.58%
-  1m 30 deg: 43.14%
-Recalls for Top 2:
-  1m: 55.56%
-  0.5m: 42.16%
-  0.1m: 7.52%
-  1m 30 deg: 55.56%
-Recalls for Top 3:
-  1m: 65.03%
-  0.5m: 51.63%
-  0.1m: 8.17%
-  1m 30 deg: 65.03%
+Recalls for Baseline (K1 with Augmentation 0):
+  1m: 51.39%
+  0.5m: 40.65%
+  0.1m: 5.29%
+  1m 30 deg: 51.39%
+
+Recalls for Best Augmentation Selection:
+  1m: 52.39%
+  0.5m: 39.89%
+  0.1m: 4.77%
+  1m 30 deg: 52.39%

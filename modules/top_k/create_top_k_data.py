@@ -16,7 +16,7 @@ CONFIG = {
     "log_dir_semantic": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt",
     "combined_prob_vols_small_net": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/combined/Final_test/combined_prob_vols_net_type-large_dataset_size-medium_epochs-30_loss-nll_acc_only-True/final_combined_model_checkpoint.ckpt",
     "split_file": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full/split.yaml",
-    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results",
+    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results_dist_1_top_10",
 
     # Dataset parameters
     "L": 0,
@@ -162,8 +162,8 @@ def plot_prob_dist_with_top_k(
     # Define a mapping from semantic class to color. Adjust as needed.
     SEMANTIC_COLORS = {
         0: 'black',
-        1: 'red',
-        2: 'blue',
+        1: 'blue',
+        2: 'red',
         3: 'orange'
     }
 
@@ -282,9 +282,9 @@ def process_data_idx(idx):
     metadata_save_path = os.path.join(image_folder, "metadata.json")
 
     # Check if scene result already exists.
-    if os.path.exists(metadata_save_path):
-        log_info.append(f"Results for scene {scene}, image index {floor_image_idx} already exist. Skipping processing.")
-        return idx, scene, floor_image_idx, log_info
+    # if os.path.exists(metadata_save_path):
+    #     log_info.append(f"Results for scene {scene}, image index {floor_image_idx} already exist. Skipping processing.")
+    #     return idx, scene, floor_image_idx, log_info
 
     # Use pre-loaded scene data (maps, walls, etc.)
     maps = scene_data["maps"]
@@ -302,8 +302,8 @@ def process_data_idx(idx):
     # 2) Extract top-K locations.
     top_k_candidates = extract_top_k_locations(prob_dist_2d,
                                                orientation_map_2d,
-                                               K=5,
-                                               min_dist_m=1.0,
+                                               K=10,
+                                               min_dist_m=1,
                                                resolution_m_per_pixel=resolution_m_per_pixel,
                                                num_orientations=36)
 
@@ -447,8 +447,8 @@ def main():
     # Load the split file to determine which scenes to process.
     with open(CONFIG["split_file"], "r") as f:
         split_data = AttrDict(yaml.safe_load(f))
-    # For demonstration, we use the first 400 scenes.
-    scene_names = split_data.train + split_data.val + split_data.test
+    # scene_names = split_data.train + split_data.val + split_data.test
+    scene_names = split_data.test[:-1]
 
     dataset_dir = CONFIG["dataset_dir"]
     prob_vol_dir = CONFIG["prob_vol_dir"]

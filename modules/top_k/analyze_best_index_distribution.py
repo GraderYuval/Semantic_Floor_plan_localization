@@ -149,13 +149,13 @@ def plot_distance_histogram(
 
     plt.xlabel("Difference in Distance (meters)")
     plt.ylabel("Percentage of Samples (%)")
-    plt.title("Difference in Distance: (Best K to GT) vs. (K1 to GT)")
+    plt.title("Difference in Distance between nearest K's to GT vs. K0 to GT")
 
     # Format Y-axis to show percentage
     plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100))
 
     # Adjust y-axis limit to accommodate up to 100%
-    plt.ylim(0, 100)
+    plt.ylim(0, 15)
 
     # Calculate bin counts and bin edges for annotations
     bin_counts, bin_edges = np.histogram(distances, bins=bins)
@@ -168,12 +168,14 @@ def plot_distance_histogram(
         # Position the text slightly above the bar
         plt.text(
             (edge_left + edge_right) / 2, 
-            percentage + 1,  # Offset by 1% above the bar
+            percentage + 1.2,  # Offset by 1% above the bar
             bin_range,
             ha="center",
-            va="bottom",
-            fontsize=8,
-            color="black"
+            va="center",
+            fontsize=9,
+            color="black",
+            rotation=90,          # Rotate text by 90 degrees
+            rotation_mode='anchor'  # Ensures rotation around the anchor point
         )
 
     # Adjust layout to ensure everything fits without overlapping
@@ -197,21 +199,23 @@ def plot_score_difference_histogram(score_diffs, bins, output_path):
 
     plt.figure(figsize=(10, 7))
     plot = sns.histplot(df['Score Difference'], bins=bins, kde=False, color="green", edgecolor="black")
-    plt.xlabel("Score Difference (K1 - Best Pick)")
+    plt.xlabel("Localization Score Difference")
     plt.ylabel("Frequency")
-    plt.title("Score Difference Histogram for Samples where Best Pick is not K1")
+    plt.title("Localization core Difference to K0 for Samples where Best Pick is not K0")
 
     # Annotate each bin with percentage and count.
     bin_counts, bin_edges = np.histogram(score_diffs, bins=bins)
     total = bin_counts.sum()
     percentages = bin_counts / total * 100
-    max_y = max(bin_counts) * 1.1
+    max_y = max(bin_counts) * 1.2
 
     for i in range(len(bin_counts)):
-        bin_range = f"{bin_edges[i]:.2f}-{bin_edges[i+1]:.2f}"
-        plt.text((bin_edges[i] + bin_edges[i+1]) / 2, bin_counts[i],
+        bin_range = f"{bin_edges[i]:.4f}-{bin_edges[i+1]:.4f}"
+        plt.text((bin_edges[i] + bin_edges[i+1]) / 2, bin_counts[i] + 100,
                  f"{bin_range}\n{percentages[i]:.1f}%\n({bin_counts[i]})",
-                 ha="center", va="bottom", fontsize=9)
+                 ha="center", va="center", fontsize=8,
+                             rotation=90,
+            rotation_mode='anchor')
 
     plt.ylim(0, max_y)
     plt.tight_layout()
@@ -234,67 +238,72 @@ def plot_semantic_depth_differences(
     output_path="semantic_depth_differences.png"
 ):
     """
-    Plot side-by-side histograms of semantic and depth differences, ensuring:
-    - Semantic percentages are based only on total semantic samples.
-    - Depth percentages are based only on total depth samples.
-    - X-axis ticks from 1 to 40 rotated by 45 degrees.
-    - External legend.
-
-    Args:
-        sem_differences (list): List of semantic difference values.
-        depth_differences (list): List of depth difference values.
-        bins (int or array-like, optional): Number of bins or bin edges. Defaults to 'auto'.
-        bin_count (int, optional): If provided, overrides 'bins' parameter.
-        output_path (str): File path to save the plot.
+    Plots separate histograms for semantic and depth differences without combining them into a single DataFrame.
+    
+    Parameters:
+    - sem_differences (list or array-like): Semantic difference values.
+    - depth_differences (list or array-like): Depth difference values.
+    - bins (int, sequence, or str, optional): Number of bins or binning strategy for the histogram.
+    - bin_count (int, optional): Overrides the `bins` parameter if provided.
+    - output_path (str, optional): Path to save the output histogram image.
     """
-    # Validate bin parameters
+    
+    # Override bins if bin_count is provided
     if bin_count is not None:
         bins = bin_count
-
-    # Calculate total number of samples separately for semantic and depth
+    
+    # Total number of samples for each category
     total_sem = len(sem_differences)
     total_depth = len(depth_differences)
-
-    # Combine data into a DataFrame with Difference Type
-    data = pd.DataFrame({
-        "Difference Value": sem_differences + depth_differences,
-        "Difference Type": ["Semantic"] * total_sem + ["Depth"] * total_depth
-    })
     
-    # Compute histogram data for annotations
-    sem_counts, bin_edges = np.histogram(sem_differences, bins=bins)
-    depth_counts, _ = np.histogram(depth_differences, bins=bins)
-
-    # Convert counts to percentages **within each category**
+    # Determine common bin edges based on both datasets
+    all_differences = np.concatenate([sem_differences, depth_differences])
+    bin_counts, bin_edges = np.histogram(all_differences, bins=bins)
+    
+    # Calculate histogram data for semantic and depth differences
+    sem_counts, _ = np.histogram(sem_differences, bins=bin_edges)
+    depth_counts, _ = np.histogram(depth_differences, bins=bin_edges)
+    
+    # Convert counts to percentages within each category
     sem_percentages = (sem_counts / total_sem) * 100 if total_sem > 0 else np.zeros_like(sem_counts)
     depth_percentages = (depth_counts / total_depth) * 100 if total_depth > 0 else np.zeros_like(depth_counts)
-
+    
     # Initialize the plot
     plt.figure(figsize=(15, 8))  # Increased width for better visibility
     
-    # Plot histograms
-    sns.histplot(
-        data=data,
-        x="Difference Value",
-        hue="Difference Type",
-        bins=bin_edges,
-        multiple="dodge",
-        edgecolor="black",
-        stat="percent",  # Normalize within each category
-        common_norm=False,  # Ensures separate normalization
-        palette={"Semantic": "#FF9999", "Depth": "#99FF99"},
+    # Plot Semantic Differences Histogram
+    plt.hist(
+        sem_differences, 
+        bins=bin_edges, 
+        alpha=0.6, 
+        label='Semantic', 
+        color="#FF9999", 
+        edgecolor='black', 
+        weights=np.ones(len(sem_differences)) / total_sem * 100  # Normalize to percentage
     )
-
+    
+    # Plot Depth Differences Histogram
+    plt.hist(
+        depth_differences, 
+        bins=bin_edges, 
+        alpha=0.6, 
+        label='Depth', 
+        color="#99FF99", 
+        edgecolor='black', 
+        weights=np.ones(len(depth_differences)) / total_depth * 100  # Normalize to percentage
+    )
+    
+    # Set labels and title
     plt.xlabel("Difference Value")
     plt.ylabel("Percentage within Category (%)")
     plt.title("Histogram of Semantic and Depth Differences")
     
     # Format Y-axis to show percentage
-    plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100))
-
-    # Position the legend outside the plot
-    plt.legend(title="Difference Type", bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-
+    plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter())
+    
+    # Position the legend
+    plt.legend(title="Difference Type", loc='upper right')
+    
     # Calculate bin centers for annotation placement
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
     bin_width = bin_edges[1] - bin_edges[0]
@@ -302,8 +311,8 @@ def plot_semantic_depth_differences(
     # Define positions for semantic and depth bars
     sem_offsets = bin_centers - bin_width / 4
     depth_offsets = bin_centers + bin_width / 4
-
-    # Annotate Semantic Differences with percentage only
+    
+    # Annotate Semantic Differences with percentage
     for i in range(len(sem_counts)):
         if sem_counts[i] == 0:
             continue  # Skip empty bins
@@ -316,8 +325,8 @@ def plot_semantic_depth_differences(
             fontsize=8,
             color="#FF0000"
         )
-
-    # Annotate Depth Differences with percentage only
+    
+    # Annotate Depth Differences with percentage
     for i in range(len(depth_counts)):
         if depth_counts[i] == 0:
             continue  # Skip empty bins
@@ -330,18 +339,20 @@ def plot_semantic_depth_differences(
             fontsize=8,
             color="#006600"
         )
-
+    
     # Adjust y-axis limit dynamically based on max percentage
-    max_percentage = max(sem_percentages.max() if total_sem > 0 else 0,
-                         depth_percentages.max() if total_depth > 0 else 0)
+    max_percentage = max(
+        sem_percentages.max() if total_sem > 0 else 0,
+        depth_percentages.max() if total_depth > 0 else 0
+    )
     plt.ylim(0, min(max_percentage * 1.2, 100))
-
-    # Configure X-axis to have ticks from 1 to 40 rotated by 45 degrees
-    plt.xticks(ticks=np.arange(0, 41, 1), rotation=45)
-
-    # Adjust layout to make space for the external legend and rotated labels
-    plt.tight_layout(rect=[0, 0, 0.85, 1])
-
+    
+    # Configure X-axis to have ticks from 0 to max bin edge, rotated by 45 degrees
+    plt.xticks(ticks=np.linspace(bin_edges[0], bin_edges[-1], num=21), rotation=45)
+    
+    # Adjust layout to make space for annotations and rotated labels
+    plt.tight_layout()
+    
     # Save the plot
     plt.savefig(output_path, bbox_inches='tight')
     print(f"Semantic and Depth differences histogram saved to {output_path}")
@@ -360,36 +371,33 @@ def process_batches(loader):
                 total_semantic_diffs, total_depth_diffs)
     """
     best_index_counts = Counter()
-    distances_to_k1 = []
+    distances_to_k0 = []
     score_differences = []
     depth_differences = []
     sem_differences = []
-    total_semantic_diffs = 0
-    total_depth_diffs = 0
 
     for batch_idx, batch in enumerate(loader):
-        best_idx = batch["best_index"][0].item() - 1  # Adjusting index if needed
+        best_idx = batch["best_index"][0].item() - 1  
         best_index_counts[best_idx] += 1
         gt_position = np.array(batch["gt_location"][0])
 
-        # For samples where candidate K1 is not the best:
-        if best_idx != 1:
-            # Calculate distance from K1 to ground truth
+        if best_idx != 0:
             k_positions = batch["k_positions"]
             if len(k_positions) > 0:
-                k1 = np.array(k_positions[0][0])
+                k0 = np.array(k_positions[0][0])
                 k_best = np.array(k_positions[best_idx][0])
-                distance_k1_to_gt = np.linalg.norm(k1[:2] - gt_position[:2])
+                distance_k0_to_gt = np.linalg.norm(k0[:2] - gt_position[:2])
                 distance_best_to_gt = np.linalg.norm(k_best[:2] - gt_position[:2])
-                distance = distance_k1_to_gt - distance_best_to_gt
-                distances_to_k1.append(distance)
+                if distance_best_to_gt > 1:
+                    continue
+                distance = distance_k0_to_gt - distance_best_to_gt
+                distances_to_k0.append(distance)
 
-            # Calculate score difference between top pick and K1
             k_scores = [score_tensor.item() for score_tensor in batch["k_scores"]]
             if len(k_scores) > 1:
                 top_pick_score = k_scores[best_idx]
-                k1_score = k_scores[0]
-                score_diff = k1_score - top_pick_score
+                k0_score = k_scores[0]
+                score_diff = k0_score - top_pick_score
                 score_differences.append(score_diff)
 
             # Compare semantic and depth rays
@@ -399,7 +407,7 @@ def process_batches(loader):
                     metadata = AttrDict(yaml.safe_load(meta_file))
 
                 # Get semantic rays for K1 and best K
-                semantic_k1 = metadata.K1.semantic_rays
+                semantic_k0 = metadata.K1.semantic_rays
                 best_k_key = f'K{best_idx + 1}'
                 if best_k_key not in metadata:
                     print(f"Metadata key {best_k_key} not found in {metadata_path}. Skipping semantic comparison.")
@@ -407,19 +415,18 @@ def process_batches(loader):
                     semantic_best = metadata[best_k_key]['semantic_rays']
                     # Compare prediction_class for each ray
                     semantic_diffs = sum(
-                        1 for ray1, ray2 in zip(semantic_k1, semantic_best)
+                        1 for ray1, ray2 in zip(semantic_k0, semantic_best)
                         if ray1['prediction_class'] != ray2['prediction_class']
                     )
                     sem_differences.append(semantic_diffs)
 
-                    # Get depth rays for K1 and best K
-                    depth_k1 = metadata.K1.depth_rays
+                    depth_k0 = metadata.K1.depth_rays
                     depth_best = metadata[best_k_key]['depth_rays']
 
                     # Compare distance_m for each ray with threshold 0.05m
                     depth_diffs = sum(
-                        1 for d1, d2 in zip(depth_k1, depth_best)
-                        if abs(d1['distance_m'] - d2['distance_m']) > 0.1
+                        1 for d1, d2 in zip(depth_k0, depth_best)
+                        if abs(d1['distance_m'] - d2['distance_m']) > 0.2
                     )
                     depth_differences.append(depth_diffs)
 
@@ -429,7 +436,7 @@ def process_batches(loader):
         if (batch_idx + 1) % 100 == 0:
             print(f"Processed {batch_idx + 1} batches.")
 
-    return best_index_counts, distances_to_k1, score_differences, sem_differences, depth_differences
+    return best_index_counts, distances_to_k0, score_differences, depth_differences, sem_differences
 
 
 def print_best_index_distribution(best_index_counts):
@@ -497,7 +504,7 @@ def main():
     loader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=0)
 
     # Process all batches and collect statistics
-    best_index_counts, distances_to_k1, score_differences, depth_differences, sem_differences = process_batches(loader)
+    best_index_counts, distances_to_k0, score_differences, depth_differences, sem_differences = process_batches(loader)
 
     # Print best index distribution
     print_best_index_distribution(best_index_counts)
@@ -505,13 +512,13 @@ def main():
     # Generate and save plots
     plot_best_index_distribution(best_index_counts, output_paths["best_index_distribution"])
     
-    if distances_to_k1:
+    if distances_to_k0:
         # Define fixed bin edges from the minimum to just above the maximum distance with a step of 0.5 meters
-        bins_distance = np.arange(min(distances_to_k1), max(distances_to_k1) + 0.1, 0.5)
+        bins_distance = np.arange(min(distances_to_k0), max(distances_to_k0) + 0.1, 0.5)
         
         # Call the modified plot_distance_histogram function using keyword arguments
         plot_distance_histogram(
-            distances=distances_to_k1,       # Pass the distance differences
+            distances=distances_to_k0,       # Pass the distance differences
             bins=bins_distance,              # Pass the fixed bin edges
             bin_count=None,                  # Optional: Not needed since bins are explicitly defined
             output_path=output_paths["distance_histogram"]  # Specify the output path
@@ -520,7 +527,7 @@ def main():
     if score_differences:
         min_diff = min(score_differences)
         max_diff = max(score_differences)
-        bins_score = np.linspace(min_diff, max_diff, num=40)
+        bins_score = np.linspace(min_diff, max_diff, num=20)
         plot_score_difference_histogram(score_differences, bins_score, output_paths["score_difference_histogram"])
 
     if depth_differences and sem_differences:

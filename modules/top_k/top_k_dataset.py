@@ -191,9 +191,9 @@ class TopKDataset(Dataset):
                             if depth_vec.shape[0] != self.desired_candidate_dim[0]:
                                 print(f"Skipping sample {scene} index {idx}: Depth candidate channel mismatch: got {depth_vec.shape[0]}, expected {self.desired_candidate_dim[0]}")
                                 valid = False
-                            elif depth_vec.shape[1] * depth_vec.shape[2] != self.desired_candidate_dim[0] * self.desired_candidate_dim[1]:
-                                print(f"Skipping sample {scene} index {idx}: Depth candidate spatial dimension mismatch: got {(depth_vec.shape[1], depth_vec.shape[2])}, expected {self.desired_candidate_dim[1]} columns in total.")
-                                valid = False
+                            # elif depth_vec.shape[1] * depth_vec.shape[2] != self.desired_candidate_dim[0] * self.desired_candidate_dim[1]:
+                            #     print(f"Skipping sample {scene} index {idx}: Depth candidate spatial dimension mismatch: got {(depth_vec.shape[1], depth_vec.shape[2])}, expected {self.desired_candidate_dim[1]} columns in total.")
+                            #     valid = False
                         else:
                             print(f"Skipping sample {scene} index {idx}: Depth candidate dimension {depth_vec.dim()} not supported.")
                             valid = False
@@ -218,9 +218,9 @@ class TopKDataset(Dataset):
                             if sem_vec.shape[0] != self.desired_candidate_dim[0]:
                                 print(f"Skipping sample {scene} index {idx}: Semantic candidate channel mismatch: got {sem_vec.shape[0]}, expected {self.desired_candidate_dim[0]}")
                                 valid = False
-                            elif sem_vec.shape[1] * sem_vec.shape[2] != self.desired_candidate_dim[0] * self.desired_candidate_dim[1]:
-                                print(f"Skipping sample {scene} index {idx}: Semantic candidate spatial dimension mismatch: got {(sem_vec.shape[1], sem_vec.shape[2])}, expected total {self.desired_candidate_dim[1]} columns.")
-                                valid = False
+                            # elif sem_vec.shape[1] * sem_vec.shape[2] != self.desired_candidate_dim[0] * self.desired_candidate_dim[1]:
+                            #     print(f"Skipping sample {scene} index {idx}: Semantic candidate spatial dimension mismatch: got {(sem_vec.shape[1], sem_vec.shape[2])}, expected total {self.desired_candidate_dim[1]} columns.")
+                            #     valid = False
                         else:
                             print(f"Skipping sample {scene} index {idx}: Semantic candidate dimension {sem_vec.dim()} not supported.")
                             valid = False
