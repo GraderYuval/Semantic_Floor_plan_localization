@@ -12,6 +12,8 @@ laser/logs_fixed_perspective_v2/
 laser/
 modules/top_k/results/
 modules/top_k/results_dist_1_top_10/
+modules/top_k/results_dist_1_top_10_vizualizations/
+modules/top_k/results_dist_1_top_10_vizualizations_v2/
 modules/top_k/results_dist_0.2_top_20/
 modules/top_k/results_dist_0.2_top_20_with_augmentations/
 # Ignore all __pycache__ directories recursively
@@ -21,3 +23,4 @@ __pycache__/
 *.pyc
 modules/Final_wights/
 .git_backup/
+

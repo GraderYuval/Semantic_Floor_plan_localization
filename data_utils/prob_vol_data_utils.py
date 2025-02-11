@@ -5,6 +5,7 @@ from torch.utils.data import Dataset
 import tqdm
 import gzip
 from PIL import Image
+import cv2
 
 
 K = np.array([[320/np.tan(0.698132), 0, 320],
@@ -213,7 +214,15 @@ class ProbVolDataset(Dataset):
         ref_idx = idx_within_scene
         data_dict['ref_idx'] = ref_idx
 
-
+        # Get reference image
+        image_path = os.path.join(
+            self.dataset_dir,
+            scene_name,
+            "rgb",
+            str(ref_idx) + ".png",
+        )
+        data_dict["image_path"] = image_path
+        
         # # Get reference pose
         ref_pose = self.gt_pose[scene_idx][ref_idx]
         data_dict["ref_pose"] = ref_pose

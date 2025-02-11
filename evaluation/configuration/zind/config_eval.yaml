@@ -4,7 +4,7 @@ desdf_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/
 log_dir_depth: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/zind/fov_80_correct_scale_final/depth/final_depth_model_checkpoint.ckpt'
 log_dir_semantic: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/zind/fov_80_correct_scale/semantic/final_semantic_model_checkpoint.ckpt'
 split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/zind_data_set_80_fov/split.yaml'
-
+prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/prob_vol'
 results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/zind/fov_80_correct_scale/final'
 # Dataset parameters
 L: 0
@@ -23,7 +23,7 @@ V: 9
 num_classes: 4
 
 use_saved_prob_vol: false
-num_of_scenes: -1
+num_of_scenes: 10
 
 # Evaluation parameters
 prediction_type: 'combined'  # Options: 'depth', 'semantic', 'combined', 'all'

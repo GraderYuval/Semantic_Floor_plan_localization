@@ -8,6 +8,7 @@ from attrdict import AttrDict
 import cv2
 import torch.nn as nn
 from PIL import Image
+import gzip  # Added for saving compressed prob_vol files
 
 # Import your models
 from modules.mono.depth_net_pl import depth_net_pl
@@ -38,8 +39,8 @@ from utils.visualization_utils import plot_prob_dist, plot_dict_relationship
 from data_utils.prob_vol_data_utils import ProbVolDataset
 from torch.utils.data import DataLoader
 
-def pad_to_max(prob_vol,max_H, max_W):
-    prob_vol= F.pad(prob_vol,(0, max_W - prob_vol.shape[1],0, max_H - prob_vol.shape[0]))
+def pad_to_max(prob_vol, max_H, max_W):
+    prob_vol = F.pad(prob_vol, (0, max_W - prob_vol.shape[1], 0, max_H - prob_vol.shape[0]))
     return prob_vol
 
 def evaluate_combined_model(
@@ -91,12 +92,12 @@ def evaluate_combined_model(
             # Use ground truth data for depth if specified
             if not config.use_ground_truth_depth:
                 ref_img_torch = torch.tensor(data["ref_img"], device=device).unsqueeze(0)
-                pred_depths, _, _ = depth_net.encoder(ref_img_torch, None) #TODO add masks
+                pred_depths, _, _ = depth_net.encoder(ref_img_torch, None)  # TODO add masks
                 pred_depths = pred_depths.squeeze(0).detach().cpu().numpy()
-                pred_rays_depth = get_ray_from_depth(pred_depths, V=config.V, F_W= config.F_W)
+                pred_rays_depth = get_ray_from_depth(pred_depths, V=config.V, F_W=config.F_W)
             else:
                 pred_depths = data["ref_depth"]
-                pred_rays_depth = get_ray_from_depth(pred_depths, V=config.V, F_W= config.F_W)
+                pred_rays_depth = get_ray_from_depth(pred_depths, V=config.V, F_W=config.F_W)
 
             # Use ground truth data for semantics if specified
             if not config.use_ground_truth_semantic:
@@ -108,12 +109,11 @@ def evaluate_combined_model(
                 )
                 sampled_indices = sampled_indices.squeeze(dim=1)
                 sampled_indices_np = sampled_indices.cpu().numpy()
-                pred_rays_semantic = get_ray_from_semantics(sampled_indices_np, V=config.V, F_W= config.F_W)        
+                pred_rays_semantic = get_ray_from_semantics(sampled_indices_np, V=config.V, F_W=config.F_W)        
                 pred_rays_semantic_v2 = get_ray_from_semantics_v2(sampled_indices_np)
-                
             else:
                 sampled_indices_np = data["ref_semantics"]
-                pred_rays_semantic = get_ray_from_semantics(sampled_indices_np, V=config.V, F_W= config.F_W)
+                pred_rays_semantic = get_ray_from_semantics(sampled_indices_np, V=config.V, F_W=config.F_W)
 
             # Localization
             prob_vol_pred_depth, _, _, _ = localize(
@@ -126,6 +126,21 @@ def evaluate_combined_model(
                 torch.tensor(pred_rays_semantic, device="cpu"),
                 return_np=False,
             )
+
+            # Save predicted probability volumes if not using ground truth (do not save GT prob_vol)
+            # The files will be saved under config.save_prob_vol_path/<scene>/ with names indicating camera index and type.
+            save_dir = os.path.join(config.prob_vol_path, scene)
+            os.makedirs(save_dir, exist_ok=True)
+            if not config.use_ground_truth_depth:
+                depth_filename = f"camera_{idx_within_scene}_pred_depth_prob_vol.pt.gz"
+                depth_save_path = os.path.join(save_dir, depth_filename)
+                with gzip.open(depth_save_path, 'wb') as f:
+                    torch.save(prob_vol_pred_depth, f)
+            if not config.use_ground_truth_semantic:
+                semantic_filename = f"camera_{idx_within_scene}_pred_semantic_prob_vol.pt.gz"
+                semantic_save_path = os.path.join(save_dir, semantic_filename)
+                with gzip.open(semantic_save_path, 'wb') as f:
+                    torch.save(prob_vol_pred_semantic, f)
         else:
             if config.use_ground_truth_depth:
                 prob_vol_pred_depth = data['prob_vol_depth_gt'].to(device)
@@ -172,7 +187,6 @@ def evaluate_combined_model(
             acc_records_for_all_weights[weight_key].append(acc)
             acc_orn_records_for_all_weights[weight_key].append(acc_orn)
             
-            # if idx_within_scene<2:
             # plot_prob_dist(
             # prob_dist=prob_dist_pred, 
             # resolution=0.1, 

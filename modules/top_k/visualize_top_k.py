@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 import json
 from tqdm import tqdm  # For progress bar
+import matplotlib.patheffects as path_effects
+import numpy.ma as ma
 
 # === 1) Hard-coded config from your config.yaml ===
 CONFIG = {
@@ -16,7 +18,7 @@ CONFIG = {
     "log_dir_semantic": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt",
     "combined_prob_vols_small_net": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/combined/Final_test/combined_prob_vols_net_type-large_dataset_size-medium_epochs-30_loss-nll_acc_only-True/final_combined_model_checkpoint.ckpt",
     "split_file": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full/split.yaml",
-    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results_dist_1_top_10_vizualizations",
+    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results_dist_1_top_10_vizualizations_v2",
 
     # Dataset parameters
     "L": 0,
@@ -52,6 +54,7 @@ CONFIG = {
 }
 
 # === 2) References to your local modules ===
+# Make sure these imports point to your actual local modules
 from data_utils.prob_vol_data_utils import ProbVolDataset
 from utils.data_loader_helper import load_scene_data
 from utils.raycast_utils import ray_cast   # <-- ensure your ray_cast function is available
@@ -147,18 +150,15 @@ def plot_prob_dist_with_top_k(
     candidate_rays: dict,
     occ: np.ndarray = None,
     resolution: float = 0.1,
-    save_path: str = None
+    save_path: str = None,
+    data = None
 ):
     """
     Resizes 'prob_dist' to match 'occ' if available, flips it vertically
     for correct orientation, overlays as a heatmap on occ, draws circles for top-K
-    candidates, and draws the rays (FOV) for each candidate. Now each ray is drawn
-    in a color corresponding to its semantic prediction.
-    
-    candidate_rays is a dict mapping candidate index (1-indexed) to a list of tuples 
-    (x, y, semantic_prediction) where (x, y) are the ray endpoint coordinates in the
-    original probability map coordinate system.
+    candidates, and draws the rays (FOV) for each candidate. 
     """
+
     # Define a mapping from semantic class to color. Adjust as needed.
     SEMANTIC_COLORS = {
         0: 'black',
@@ -166,7 +166,6 @@ def plot_prob_dist_with_top_k(
         2: 'red',
         3: 'orange'
     }
-
     if isinstance(prob_dist, torch.Tensor):
         prob_dist_np = prob_dist.detach().cpu().numpy()
     else:
@@ -177,19 +176,34 @@ def plot_prob_dist_with_top_k(
         prob_dist_resized = cv2.resize(prob_dist_np, (W_occ, H_occ), interpolation=cv2.INTER_LINEAR)
     else:
         prob_dist_resized = prob_dist_np
-
+    
     # Flip vertically for correct orientation
     prob_dist_resized = np.flipud(prob_dist_resized)
 
     fig, ax = plt.subplots(figsize=(8, 6))
     if occ is not None:
-        occ_flipped = np.flipud(occ)
-        if occ_flipped.ndim == 2:
-            ax.imshow(occ_flipped, cmap='gray', alpha=0.6)
-        else:
-            ax.imshow(occ_flipped, alpha=0.6)
-    ax.imshow(prob_dist_resized, cmap='viridis', alpha=0.5)
+        # Flip the occupancy image vertically.
+        occ_flipped = np.flipud(occ)  # shape (826, 1445, 3)
+        
+        # Define a threshold for what is considered "white".
+        # Here we assume uint8 image data in 0-255.
+        threshold = 250  # adjust if you want "near-white" to count as white
 
+        # Create an alpha channel:
+        # For each pixel, if all three channels are >= threshold, set alpha=0 (transparent)
+        # Otherwise, set alpha=255 (opaque).
+        alpha_channel = np.where(np.all(occ_flipped >= threshold, axis=-1), 0, 255).astype(np.uint8)
+        
+        # Combine the RGB channels with the new alpha channel to create an RGBA image.
+        occ_rgba = np.dstack([occ_flipped, alpha_channel])
+
+    # First, plot the jet probability distribution.
+    ax.imshow(prob_dist_resized, cmap='jet', alpha=0.8)
+
+    # Then, overlay the occupancy image.
+    if occ is not None:
+        ax.imshow(occ_rgba)
+    
     H_orig, W_orig = prob_dist_np.shape
     if occ is not None:
         H_occ, W_occ = occ.shape[:2]
@@ -205,26 +219,120 @@ def plot_prob_dist_with_top_k(
         y_scaled = (y_pixel / H_orig) * H_occ
         y_flipped = (H_occ - 1) - y_scaled
 
-        # Draw candidate circle
-        circ = Circle((x_scaled, y_flipped), radius=100, fill=False, edgecolor='green', linewidth=2)
-        ax.add_patch(circ)
-        ax.plot(x_scaled, y_flipped, 'ro', markersize=3)
-        label_str = f"K{i}\n{cand['prob_value']:.3f}"
-        ax.text(x_scaled, y_flipped - 12, label_str, fontsize=10, color='blue', ha='center', va='top')
+        # Circles for visual reference
+        circ_large = Circle(
+            (x_scaled, y_flipped),
+            radius=100,
+            fill=False,
+            edgecolor='black',
+            linewidth=2,
+            alpha=1,
+            linestyle=':'  # dotted line style
+        )
+        ax.add_patch(circ_large)
 
-        # Plot the rays (if available)
-        if i in candidate_rays:
-            for (rx, ry, semantic_class) in candidate_rays[i]:
-                # Scale the ray endpoint similarly.
-                rx_scaled = rx
-                ry_scaled = ry
-                # Adjust for flipping
-                ry_scaled = (H_occ - 1) - ry_scaled
-                ray_color = SEMANTIC_COLORS.get(semantic_class, 'cyan')
-                ax.plot([x_scaled, rx_scaled], [y_flipped, ry_scaled], color=ray_color, linewidth=1)
+        circ_small = Circle(
+            (x_scaled, y_flipped),
+            radius=50,
+            fill=False,
+            edgecolor='black',
+            linewidth=2,
+            alpha=1,
+            linestyle=':'  # dotted line style
+        )
+        ax.add_patch(circ_small)
 
+        # Plot a dot at the center
+        ax.plot(
+            x_scaled,
+            y_flipped,
+            marker='o',
+            markersize=3,
+            markerfacecolor='black',
+            markeredgecolor='black',
+        )
+        
+        label_str = f"{i}"
+        text = ax.text(x_scaled, y_flipped - 3, label_str, fontsize=11, color='black', 
+                    ha='center', va='bottom', fontweight='bold')
+        # Apply a white stroke (outline) to the text
+        text.set_path_effects([
+            path_effects.Stroke(linewidth=2, foreground='white'),
+            path_effects.Normal()
+        ])
+
+        if i in candidate_rays and candidate_rays[i]:
+            # Select the middle ray from the list
+            middle_idx = len(candidate_rays[i]) // 2
+            rx, ry, _ = candidate_rays[i][middle_idx]
+            # The provided ray coordinate (rx, ry) needs to be flipped in y.
+            ray_target_x = rx
+            ray_target_y = (H_occ - 1) - ry
+
+            # Compute the direction vector from candidate center to ray target.
+            vec_x = ray_target_x - x_scaled
+            vec_y = ray_target_y - y_flipped
+            mag = np.sqrt(vec_x**2 + vec_y**2)
+            if mag > 0:
+                # Scale the vector to 100 pixels (1m).
+                dx = (vec_x / mag) * 80
+                dy = (vec_y / mag) * 80
+            else:
+                dx, dy = 0, 0
+
+            # Plot an arrow in red.
+            a_r=ax.arrow(
+                x_scaled, 
+                y_flipped, 
+                dx, 
+                dy, 
+                color='white', 
+                linewidth=3, 
+                head_width=20, 
+                head_length=20, 
+                length_includes_head=True
+            )
+            
+            a_r.set_path_effects([
+            path_effects.Stroke(linewidth=2, foreground='white'),
+            path_effects.Normal()
+            ])
+
+        # Plot ground truth location
+        if 'ref_pose' in data:
+            # The code below expects data['ref_pose'] in meters, so multiply by 100 for pixel:
+            gt_x_pix = data['ref_pose'][0] * 100.0
+            gt_y_pix = data['ref_pose'][1] * 100.0
+            gt_y_flipped = (H_occ - 1) - gt_y_pix
+            ax.plot(
+                gt_x_pix,
+                gt_y_flipped,
+                marker='o',
+                markersize=10,
+                markerfacecolor='green',
+                markeredgecolor='black',
+            )
+        
+        theta = data['ref_pose'][2]
+        # Compute arrow components. Note the negative sign for dy due to y-flip.
+        dx = np.cos(theta) * 80  # 100 pixels = 1 m.
+        dy = np.sin(theta) * 80
+        a_g = ax.arrow(
+            gt_x_pix, 
+            gt_y_flipped, 
+            dx, 
+            dy, 
+            color='green', 
+            linewidth=3, 
+            head_width=20, 
+            head_length=20, 
+            length_includes_head=True
+        )
+        a_g.set_path_effects([
+            path_effects.Stroke(linewidth=2, foreground='white'),
+            path_effects.Normal()
+        ])
     ax.axis('off')
-    ax.set_title("Combined Probability Distribution + Top-K Picks with Rays (FOV)")
     if save_path is not None:
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         fig.savefig(save_path, bbox_inches='tight', pad_inches=0, dpi=100)
@@ -245,6 +353,7 @@ def process_data_idx(idx):
     Process a single dataset image. Uses global_test_set and global_scene_data.
     Returns a tuple (idx, scene, floor_image_idx, log_info)
     """
+    
     log_info = []
     test_set = global_test_set
     scene_data = global_scene_data
@@ -260,7 +369,7 @@ def process_data_idx(idx):
 
     # Get the data item
     data = test_set[idx]
-    # Compute the scene index using the stored scene_start_idx array.
+    # scene index
     scene_idx = np.sum(idx >= np.array(test_set.scene_start_idx)) - 1
     scene = test_set.scene_names[scene_idx]
     if 'floor' not in scene:
@@ -275,16 +384,9 @@ def process_data_idx(idx):
         log_info.append(f"Scene {scene} not in valid_scene_names. Skipping...")
         return idx, scene, floor_image_idx, log_info
 
-    # Prepare output folder paths
-    scene_folder = os.path.join(results_dir, scene)
-    image_folder = os.path.join(scene_folder, f"image_{floor_image_idx}")
-    os.makedirs(image_folder, exist_ok=True)
-    metadata_save_path = os.path.join(image_folder, "metadata.json")
-
-    # Check if scene result already exists.
-    # if os.path.exists(metadata_save_path):
-    #     log_info.append(f"Results for scene {scene}, image index {floor_image_idx} already exist. Skipping processing.")
-    #     return idx, scene, floor_image_idx, log_info
+    # We'll first figure out which candidate folder we belong to (k1..k10 or 'other')
+    # so we won't create the standard scene_folder path as before.
+    # Instead, we create them based on the nearest candidate to GT in meters.
 
     # Use pre-loaded scene data (maps, walls, etc.)
     maps = scene_data["maps"]
@@ -317,6 +419,38 @@ def process_data_idx(idx):
 
     walls_map = walls[scene]
 
+    # --- DETERMINE NEAREST K-FOLDER BASED ON GT ---
+    # ground-truth in meters
+    gt_x_m = data['ref_pose'][0]  # X in meters
+    gt_y_m = data['ref_pose'][1]  # Y in meters
+
+    distances = []
+    for cand in top_k_candidates:
+        cand_x_m = cand['x'] * resolution_m_per_pixel
+        cand_y_m = cand['y'] * resolution_m_per_pixel
+        dist_m = np.sqrt((cand_x_m - gt_x_m)**2 + (cand_y_m - gt_y_m)**2)
+        distances.append(dist_m)
+
+    distances = np.array(distances)
+    if len(distances) > 0:
+        min_idx = np.argmin(distances)
+        min_val = distances[min_idx]
+        if min_val < 1.0:
+            # folder name will be k{min_idx+1}
+            folder_k = f"k{min_idx+1}"
+        else:
+            folder_k = "other"
+    else:
+        # No candidates found for some reason
+        folder_k = "other"
+
+    # Now create the folder structure as requested:
+    # results_dir/kX/scene/image_{floor_image_idx}  or  results_dir/other/scene/...
+    scene_folder = os.path.join(results_dir, folder_k, scene)
+    image_folder = os.path.join(scene_folder, f"image_{floor_image_idx}")
+    os.makedirs(image_folder, exist_ok=True)
+    metadata_save_path = os.path.join(image_folder, "metadata.json")
+
     # 3) Compute candidate rays (for plotting the FOV).
     ray_n = 40  # number of rays per candidate
     F_W = 1 / np.tan(0.698132) / 2
@@ -333,34 +467,35 @@ def process_data_idx(idx):
         cand_orientation = cand['orientation_radians']
         cand_score = cand['prob_value']
 
-        # Candidate center in original probability map pixel coordinates.
+        # Candidate center in original probability map *pixels* (for ray-casting)
         center_x = cand['x'] * 10
         center_y = cand['y'] * 10
         candidate_pos_pixels = np.array([center_x, center_y])
 
+        # Generate ray angles
         center_angs = np.flip(np.arctan2((np.arange(ray_n) - np.arange(ray_n).mean()),
                                          ray_n * F_W))
         ray_angles = center_angs + cand_orientation
 
         depth_rays = []
         semantic_rays = []
-        candidate_ray_endpoints = []  # To store endpoints (x, y, semantic_prediction) in pixels
+        candidate_ray_endpoints = []
 
         for ang in ray_angles:
-            # Cast ray on walls map for depth and hit coordinates.
+            # Cast ray on walls map for depth
             dist_depth, _, hit_coords_walls, _ = ray_cast(
                 walls_map, candidate_pos_pixels, ang, dist_max=depth_max*100
             )
-            # Cast ray on semantic map for semantic prediction.
+            # Cast ray on semantic map for semantic prediction
             _, prediction_class, _, _ = ray_cast(
                 semantic_map, candidate_pos_pixels, ang, dist_max=depth_max*100, min_dist=80
             )
-            depth_val_m = dist_depth / 100.0  
+            depth_val_m = dist_depth / 100.0
             depth_rays.append(depth_val_m)
             semantic_rays.append(prediction_class)
             candidate_ray_endpoints.append((hit_coords_walls[0], hit_coords_walls[1], prediction_class))
 
-        # Flip the ray endpoints order (if needed)
+        # Flip endpoints if needed
         endpoints_tensor = torch.tensor(candidate_ray_endpoints)
         endpoints_tensor = torch.flip(endpoints_tensor, [0])
         candidate_ray_endpoints = endpoints_tensor.tolist()
@@ -398,7 +533,8 @@ def process_data_idx(idx):
                               candidate_rays=candidate_rays,
                               occ=semantic_map,
                               resolution=resolution_m_per_pixel,
-                              save_path=plot_filename)
+                              save_path=plot_filename,
+                              data=data)
 
     # 5) Save metadata JSON and tensors for the candidate rays.
     with open(metadata_save_path, "w") as mf:
@@ -419,6 +555,12 @@ def process_data_idx(idx):
     log_info.append(f"Depth tensor [K, ray_n]:\n{depth_tensor}")
     log_info.append(f"Semantic tensor [K, ray_n]:\n{semantic_tensor}")
 
+    image_path = data["image_path"]
+    ref_img = cv2.imread(image_path)
+    ref_img = np.flip(ref_img, axis=1)
+    image_save_path = os.path.join(image_folder, f"image_{scene}_{floor_image_idx}.png")
+    cv2.imwrite(image_save_path, ref_img)
+    
     return idx, scene, floor_image_idx, log_info
 
 # === 6) Batch worker function (processes a chunk of image indices) ===
@@ -448,7 +590,7 @@ def main():
     with open(CONFIG["split_file"], "r") as f:
         split_data = AttrDict(yaml.safe_load(f))
     # scene_names = split_data.train + split_data.val + split_data.test
-    scene_names = split_data.test[:10]
+    scene_names = split_data.test[:20]
 
     dataset_dir = CONFIG["dataset_dir"]
     prob_vol_dir = CONFIG["prob_vol_dir"]
@@ -489,12 +631,9 @@ def main():
     indices = list(range(num_items))
     batches = [indices[i:i+chunk_size] for i in range(0, len(indices), chunk_size)]
 
-    # --- Multiprocessing using ProcessPoolExecutor ---
     from concurrent.futures import ProcessPoolExecutor, as_completed
 
-    # Limit the number of workers to, say, 4 (adjust this value as needed)
-    max_workers = 4
-
+    max_workers = 4  # Adjust this value as needed
     all_results = []
     with ProcessPoolExecutor(max_workers=max_workers,
                              initializer=worker_init,
