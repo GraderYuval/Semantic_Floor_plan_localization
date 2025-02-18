@@ -11,6 +11,7 @@ import logging
 # Import your models
 from modules.mono.depth_net_pl import depth_net_pl
 from modules.semantic.semantic_net_pl import semantic_net_pl
+from modules.semantic.semantic_net_pl_maskformer_small import semantic_net_pl_maskformer_small
 
 # Import your dataset
 from data_utils.data_utils import GridSeqDataset
@@ -72,11 +73,18 @@ def initializer(
         depth_net.eval()
 
         # Load semantic_net
-        semantic_net = semantic_net_pl.load_from_checkpoint(
-            checkpoint_path= log_dir_semantic,
-            num_classes=config.num_classes,
-        ).to(device)
-        semantic_net.eval()
+        if config.use_mask_former_semantics:            
+            semantic_net = semantic_net_pl_maskformer_small.load_from_checkpoint(
+                checkpoint_path= config.maskformer_semantics_path,
+                num_classes=config.num_classes,
+            ).to(device)
+            semantic_net.eval()
+        else:
+            semantic_net = semantic_net_pl.load_from_checkpoint(
+                checkpoint_path= log_dir_semantic,
+                num_classes=config.num_classes,
+            ).to(device)
+            semantic_net.eval()
 
         # Assign shared data
         shared_test_set = test_set
@@ -311,7 +319,7 @@ def main():
 
     scene_numbers = range(start_scene, end_scene + 1)
     scene_names = [f"scene_{str(i).zfill(5)}" for i in scene_numbers]
-    scene_names = ['scene_03261','scene_03279','scene_03280','scene_03452']
+    # scene_names = ['scene_03261','scene_03279','scene_03280','scene_03452']
 
     try:
         test_set = GridSeqDataset(
@@ -326,7 +334,7 @@ def main():
 
     # Load desdf, semantics, maps, ground truth poses, and any additional data
     try:
-        desdfs, semantics, _, gt_poses, _ = load_scene_data(
+        desdfs, semantics, _, gt_poses, _, _ = load_scene_data(
             test_set, dataset_dir, desdf_path
         )
         logging.info("Scene data loaded successfully.")

@@ -2,7 +2,8 @@
 
 dataset: "zind_data_set_80_fov"
 dataset_path: "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind"
-ckpt_path: "./logs/zind/fov_80_correct_scale/"
+# ckpt_path: "./logs/zind/fov_80_correct_scale/"
+ckpt_path: "./logs/zind/mask2Former_tiny_50k_with_augmentaions/"
 epochs: 100
 batch_size: 8
 lr: 0.001
@@ -24,3 +25,11 @@ augmentation:
   add_rp: True
   roll: 0
   pitch: 0
+
+use_maskformer: True
+use_small: True
+
+model_type: "semantic"
+
+image_augment: true
+image_augment_noise_std: 0.02

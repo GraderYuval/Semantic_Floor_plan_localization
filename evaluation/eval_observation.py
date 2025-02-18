@@ -12,6 +12,8 @@ from PIL import Image
 # Import your models
 from modules.mono.depth_net_pl import depth_net_pl
 from modules.semantic.semantic_net_pl import semantic_net_pl
+from modules.semantic.semantic_net_pl_maskformer import semantic_net_pl_maskformer
+from modules.semantic.semantic_net_pl_maskformer_small import semantic_net_pl_maskformer_small
 
 # Import your dataset
 from data_utils.data_utils import GridSeqDataset
@@ -24,7 +26,6 @@ from utils.localization_utils import (
     get_ray_from_semantics_v2,
     localize,
     finalize_localization,
-    finalize_localization_acc_only
 )
 from utils.result_utils import (
     save_acc_and_orn_records,
@@ -91,7 +92,9 @@ def evaluate_combined_model(
             # Use ground truth data for depth if specified
             if not config.use_ground_truth_depth:
                 ref_img_torch = torch.tensor(data["ref_img"], device=device).unsqueeze(0)
-                pred_depths, _, _ = depth_net.encoder(ref_img_torch, None) #TODO add masks
+                ref_mask_torch = torch.tensor(data["ref_mask"], device=device).unsqueeze(0)
+                with torch.no_grad():
+                    pred_depths, _, _ = depth_net.encoder(ref_img_torch, ref_mask_torch)
                 pred_depths = pred_depths.squeeze(0).detach().cpu().numpy()
                 pred_rays_depth = get_ray_from_depth(pred_depths, V=config.V, F_W= config.F_W)
             else:
@@ -101,19 +104,21 @@ def evaluate_combined_model(
             # Use ground truth data for semantics if specified
             if not config.use_ground_truth_semantic:
                 ref_img_torch = torch.tensor(data["ref_img"], device=device).unsqueeze(0)
-                _, _, prob = semantic_net.encoder(ref_img_torch, None)
+                ref_mask_torch = torch.tensor(data["ref_mask"], device=device).unsqueeze(0)
+                with torch.no_grad():
+                    _, _, prob = semantic_net.encoder(ref_img_torch, ref_mask_torch)
                 prob_squeezed = prob.squeeze(dim=0)
                 sampled_indices = torch.multinomial(
                     prob_squeezed, num_samples=1, replacement=True
                 )
                 sampled_indices = sampled_indices.squeeze(dim=1)
                 sampled_indices_np = sampled_indices.cpu().numpy()
-                pred_rays_semantic = get_ray_from_semantics(sampled_indices_np, V=config.V, F_W= config.F_W)        
-                pred_rays_semantic_v2 = get_ray_from_semantics_v2(sampled_indices_np)
+                # pred_rays_semantic = get_ray_from_semantics(sampled_indices_np, V=config.V, F_W= config.F_W)        
+                pred_rays_semantic = get_ray_from_semantics_v2(sampled_indices_np)
                 
             else:
                 sampled_indices_np = data["ref_semantics"]
-                pred_rays_semantic = get_ray_from_semantics(sampled_indices_np, V=config.V, F_W= config.F_W)
+                pred_rays_semantic = get_ray_from_semantics_v2(sampled_indices_np)
 
             # Localization
             prob_vol_pred_depth, _, _, _ = localize(
@@ -125,6 +130,7 @@ def evaluate_combined_model(
                 torch.tensor(semantic["desdf"]),
                 torch.tensor(pred_rays_semantic, device="cpu"),
                 return_np=False,
+                localize_type = "semantic"
             )
         else:
             if config.use_ground_truth_depth:
@@ -134,9 +140,6 @@ def evaluate_combined_model(
                 prob_vol_pred_depth = data['prob_vol_depth'].to(device)
                 prob_vol_pred_semantic = data['prob_vol_semantic'].to(device)
 
-        # if config.pad_to_max:
-        #     prob_vol_pred_depth = pad_to_max(prob_vol_pred_depth, config.max_h//10,config.max_w//10)
-            # prob_vol_pred_semantic = pad_to_max(prob_vol_pred_semantic, config.max_h//10,config.max_w//10)
             
         # Combine probabilities using weights
         for depth_weight, semantic_weight in weight_combinations:
@@ -171,21 +174,7 @@ def evaluate_combined_model(
             
             acc_records_for_all_weights[weight_key].append(acc)
             acc_orn_records_for_all_weights[weight_key].append(acc_orn)
-            
-            # if idx_within_scene<2:
-            # plot_prob_dist(
-            # prob_dist=prob_dist_pred, 
-            # resolution=0.1, 
-            # save_path= '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/temp_figs', 
-            # file_name=f"{idx_within_scene}_depth-{depth_weight}_semantic-{semantic_weight}_net.png", 
-            # occ=maps[scene], 
-            # pose_pred=pose_pred, 
-            # ref_pose_map=ref_pose_map,
-            # plot_type="combined",
-            # acc = acc,
-            # acc_orn = acc_orn                
-            # )
-
+        
     # Directory to save the plots
     save_path = '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/temp_figs'
 
@@ -238,8 +227,9 @@ def evaluate_observation(prediction_type, config, device):
         split = AttrDict(yaml.safe_load(f))
     
     if config.use_saved_prob_vol:
-        scene_names = split.test  # Use all test scenes
-        scene_names = split.test[:config.num_of_scenes] 
+        # scene_names = split.test[:config.num_of_scenes]  # Use all test scenes
+        scene_names = split.val[:config.num_of_scenes]  # Use all test scenes
+        # scene_names = split.train[:config.num_of_scenes] 
         test_set = ProbVolDataset(
             dataset_dir=dataset_dir,
             scene_names=scene_names,
@@ -251,6 +241,7 @@ def evaluate_observation(prediction_type, config, device):
         test_set = GridSeqDataset(
             dataset_dir,
             split.test[:config.num_of_scenes],
+            # split.train[:config.num_of_scenes],
             L=L,
         )
 
@@ -266,11 +257,28 @@ def evaluate_observation(prediction_type, config, device):
                 d_hyp=d_hyp,
                 D=D,
             ).to(device)
+            depth_net.eval()
+
         if prediction_type in ["semantic", "combined"]:
-            semantic_net = semantic_net_pl.load_from_checkpoint(
-                checkpoint_path=log_dir_semantic,
-                num_classes=config.num_classes,
-            ).to(device)
+            if config.use_maskformer:
+                if config.use_small_maskformer:                 
+                    semantic_net = semantic_net_pl_maskformer_small.load_from_checkpoint(
+                        checkpoint_path=config.log_dir_semantic_maskformer_small,
+                        num_classes=config.num_classes,
+                    ).to(device)
+                    semantic_net.eval()            
+                else:
+                    semantic_net = semantic_net_pl_maskformer.load_from_checkpoint(
+                        checkpoint_path=config.log_dir_semantic_maskformer,
+                        num_classes=config.num_classes,
+                    ).to(device)
+                    semantic_net.eval()            
+            else:
+                semantic_net = semantic_net_pl.load_from_checkpoint(
+                    checkpoint_path=log_dir_semantic,
+                    num_classes=config.num_classes,
+                ).to(device)
+                semantic_net.eval()
 
     # Create results directory for this prediction type if it doesn't exist
     results_type_dir = os.path.join(results_dir, prediction_type)

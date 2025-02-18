@@ -18,7 +18,7 @@ CONFIG = {
     "log_dir_semantic": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt",
     "combined_prob_vols_small_net": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/combined/Final_test/combined_prob_vols_net_type-large_dataset_size-medium_epochs-30_loss-nll_acc_only-True/final_combined_model_checkpoint.ckpt",
     "split_file": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full/split.yaml",
-    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results_dist_1_top_10_vizualizations_v2",
+    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results_dist_1_top_5_vizualize",
 
     # Dataset parameters
     "L": 0,
@@ -404,7 +404,7 @@ def process_data_idx(idx):
     # 2) Extract top-K locations.
     top_k_candidates = extract_top_k_locations(prob_dist_2d,
                                                orientation_map_2d,
-                                               K=10,
+                                               K=5,
                                                min_dist_m=1,
                                                resolution_m_per_pixel=resolution_m_per_pixel,
                                                num_orientations=36)
@@ -590,7 +590,7 @@ def main():
     with open(CONFIG["split_file"], "r") as f:
         split_data = AttrDict(yaml.safe_load(f))
     # scene_names = split_data.train + split_data.val + split_data.test
-    scene_names = split_data.test[:20]
+    scene_names = split_data.test[:10]
 
     dataset_dir = CONFIG["dataset_dir"]
     prob_vol_dir = CONFIG["prob_vol_dir"]

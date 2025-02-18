@@ -10,13 +10,15 @@ from attrdict import AttrDict
 # === 1) Hard-coded configuration (as in your config.yaml) ===
 CONFIG = {
     "dataset_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full",
-    "prob_vol_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full",
+    "prob_vol_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/prob_vols_mask2former",
     "desdf_path": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/desdf",
+  
     "log_dir_depth": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/Final_wights/depth/final_depth_model_checkpoint.ckpt",
     "log_dir_semantic": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/Final_wights/semantic/final_semantic_model_checkpoint.ckpt",
     "combined_prob_vols_small_net": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/combined/Final_test/combined_prob_vols_net_type-large_dataset_size-medium_epochs-30_loss-nll_acc_only-True/final_combined_model_checkpoint.ckpt",
+    
     "split_file": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/test_data_set_full/structured3d_perspective_full/split.yaml",
-    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results_dist_0.2_top_20_with_augmentations",
+    "results_dir": "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/modules/top_k/results_dist_0.1_top_20_with_augmentations",
 
     # Dataset parameters
     "L": 0,
@@ -198,7 +200,7 @@ def process_data_idx(idx):
     top_k_candidates = extract_top_k_locations(prob_dist_2d,
                                                orientation_map_2d,
                                                K=20,
-                                               min_dist_m=0.2,
+                                               min_dist_m=0.1,
                                                resolution_m_per_pixel=resolution_m_per_pixel,
                                                num_orientations=36)
 
@@ -364,7 +366,7 @@ def main():
     with open(CONFIG["split_file"], "r") as f:
         split_data = AttrDict(yaml.safe_load(f))
     # For example, process only the test scenes.
-    scene_names = split_data.test[:-1]
+    scene_names = split_data.test[:1]
 
     dataset_dir = CONFIG["dataset_dir"]
     prob_vol_dir = CONFIG["prob_vol_dir"]
@@ -378,7 +380,7 @@ def main():
         dataset_dir=dataset_dir,
         scene_names=scene_names,
         L=L,
-        prob_vol_path=os.path.join(prob_vol_dir, "prob_vols"),
+        prob_vol_path= prob_vol_dir,
         acc_only=False
     )
     num_items = len(test_set)

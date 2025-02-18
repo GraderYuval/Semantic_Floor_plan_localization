@@ -15,49 +15,24 @@ import torch
 from modules.semantic.semantic_mapper import ObjectType
 
 def custom_loss_with_normalization(desdf, rays):
-    """
-    Computes a penalty-driven loss for mismatches, normalized by the size of predictions.
-    Input:
-        desdf: (H, W, O) actual data
-        rays: (H, W, O) predicted data
-    Output:
-        loss: (H, W) loss per spatial location
-    """
-    # Boolean tensors for presence
-    pred_window = rays[..., ObjectType.WINDOW.value] > 0
-    pred_door = rays[..., ObjectType.DOOR.value] > 0
-    pred_wall = rays[..., ObjectType.WALL.value] > 0
+    # Define weights according to the enum: WALL=0, WINDOW=1, DOOR=2, UNKNOWN=3
+    weights = torch.tensor([1.0, 5.0, 3.0, 0.0], device=rays.device)
     
-    actual_window = desdf[..., ObjectType.WINDOW.value] > 0
-    actual_door = desdf[..., ObjectType.DOOR.value] > 0
-    actual_wall = desdf[..., ObjectType.WALL.value] > 0
+    # Create a mask that is 1 when predicted and ground truth differ, else 0.
+    mismatches = (rays != desdf).float()  # Shape: (H, W, V)
     
-    # Penalties for false positives
-    window_mismatch = pred_window & ~actual_window  # Predict window but no window in actual
-    door_mismatch = pred_door & ~actual_door       # Predict door but no door in actual
-    wall_mismatch = pred_wall & ~actual_wall       # Predict wall but no wall in actual
+    # Look up the weight for each predicted ray.
+    ray_weights = weights[rays.long()]  # Shape: (H, W, V)
     
-    # Count total predictions for normalization
-    total_window_preds = pred_window.sum().float()
-    total_door_preds = pred_door.sum().float()
-    total_wall_preds = pred_wall.sum().float()
+    # Compute the weighted error per ray.
+    weighted_errors = mismatches * ray_weights  # Shape: (H, W, V)
     
-    # Avoid division by zero
-    total_window_preds = torch.clamp(total_window_preds, min=1.0)
-    total_door_preds = torch.clamp(total_door_preds, min=1.0)
-    total_wall_preds = torch.clamp(total_wall_preds, min=1.0)
+    # Sum the weighted errors over the ray dimension.
+    total_penalty_per_pixel = weighted_errors.sum(dim=2)  # Shape: (H, W)
     
-    # Assign penalties normalized by the total predictions
-    window_penalty = (5.0 * total_window_preds) * window_mismatch.float()
-    door_penalty = (3.0 * total_door_preds) * door_mismatch.float()
-    wall_penalty = (1.0 / total_wall_preds) * wall_mismatch.float()
-    
-    # Combine penalties
-    total_penalty = window_penalty + door_penalty + wall_penalty
-    
-    # Return negative exponential for probabilistic compatibility
-    return -torch.exp(-total_penalty)
-
+    # Return the negative total penalty so that a perfect match yields 0.
+    loss = -total_penalty_per_pixel
+    return loss
 
 def localize(
     desdf: torch.tensor, rays: torch.tensor, orn_slice=36, return_np=True, lambd=40, localize_type = "depth"
@@ -167,32 +142,6 @@ def finalize_localization(prob_vol: torch.IntTensor) -> Tuple[torch.tensor]:
         pred.detach().cpu().numpy(),
     )
     
-def finalize_localization_acc_only(prob_vol: torch.IntTensor) -> Tuple[torch.tensor]:
-    """
-    Finalize localization using the combined probability volume without orientation.
-    Input:
-        prob_vol: combined probability volume (H, W)
-    Output:
-        prob_dist: probability distribution (same as prob_vol in this case), ndarray
-        pred: (2, ) predicted state [x, y], ndarray
-    """
-    # prob_dist is simply the prob_vol in this case as there is no orientation dimension
-    prob_dist = prob_vol
-
-    # get the prediction
-    pred_y_in_pixel, pred_x_in_pixel = torch.where(prob_dist == prob_dist.max())
-    sampled_index = torch.randint(0, pred_y_in_pixel.shape[0], (1,))
-    
-    pred_y = pred_y_in_pixel[sampled_index]
-    pred_x = pred_x_in_pixel[sampled_index]
-    pred = torch.cat((pred_x, pred_y))
-    
-    return (
-        prob_vol.detach().cpu().numpy(),
-        prob_dist.detach().cpu().numpy(),
-        pred.detach().cpu().numpy(),
-    )
-
 def get_ray_from_depth(d, V=7, dv=10, a0=None, F_W=1/np.tan(0.698132)/2):
     """
     Shoot the rays to the depths, from left to right
@@ -213,7 +162,6 @@ def get_ray_from_depth(d, V=7, dv=10, a0=None, F_W=1/np.tan(0.698132)/2):
         w = np.tan(angles) * W * F_W + (W - 1) / 2  # desired width, left to right
     else:
         w = np.tan(angles) * W * F_W + a0  # left to right
-    # w=np.linspace(0, 39, 9)
     interp_d = griddata(np.arange(W).reshape(-1, 1), d, w, method="linear")
     rays = interp_d / np.cos(angles)
 
@@ -249,33 +197,38 @@ def get_ray_from_semantics(semantics, V=7, dv=10, a0=None, F_W=1/np.tan(0.698132
 
 from collections import Counter
 
-def get_ray_from_semantics_v2(original_rays, angle_between_rays=80/39, desired_ray_count=9, window_size=0):
-
+def get_ray_from_semantics_v2(original_rays, angle_between_rays=80/40, desired_ray_count=9, window_size=1):
     desired_angle_step = 10  
-    
-    # Placeholder for the resulting representative rays
+
     representative_rays = []
     
-    # Iterate over each desired ray
+    # Assume the center of the FOV corresponds to the middle index.
+    center_index = len(original_rays) // 2
+
+    # For an odd number of desired rays, the middle one (index desired_ray_count//2) is 0°.
+    # Thus, the desired angles (in degrees) are computed relative to 0.
     for i in range(desired_ray_count):
-        # Calculate the angle of the desired ray
-        desired_angle = i * desired_angle_step
+        # Compute desired angle relative to the center.
+        desired_angle = (i - desired_ray_count // 2) * desired_angle_step
         
-        # Find the closest index in the original rays
-        idx_float = desired_angle / angle_between_rays
-        idx = round(idx_float)
+        # Compute the corresponding index offset (how many original rays away from the center).
+        idx_offset = desired_angle / angle_between_rays
         
-        # Collect neighbors for majority vote
+        # The target index is the center index plus the offset.
+        idx = round(center_index + idx_offset)
+        
+        # Clamp the index so it remains within the valid range.
+        idx = max(0, min(idx, len(original_rays) - 1))
+        
+        # If a window is provided, collect neighbors around the target index.
         neighbors = []
-        for j in range(max(0,idx - window_size), idx + window_size + 1):
-            if 0 <= j < len(original_rays):  # Ensure we stay within bounds
-                neighbors.append(original_rays[j])
+        for j in range(max(0, idx - window_size), min(len(original_rays), idx + window_size + 1)):
+            neighbors.append(original_rays[j])
         
-        # Perform majority vote
+        # Use majority vote from the neighbors if there is a window; otherwise, just take the ray.
         count = Counter(neighbors)
         majority_class = count.most_common(1)[0][0]
         
-        # Append the majority class to the representative rays
         representative_rays.append(majority_class)
     
     return np.array(representative_rays)

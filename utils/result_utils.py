@@ -13,10 +13,7 @@ def save_acc_and_orn_records(acc_record, acc_orn_record, weight_dir):
         np.save(os.path.join(weight_dir, "acc_orn_record.npy"), acc_orn_record)
 
 def calculate_recalls(acc_record, acc_orn_record):
-    recalls = {
-        "10m": np.sum(acc_record < 10) / acc_record.shape[0],
-        "3m": np.sum(acc_record < 3) / acc_record.shape[0],
-        "2m": np.sum(acc_record < 2) / acc_record.shape[0],
+    recalls = {        
         "1m": np.sum(acc_record < 1) / acc_record.shape[0],
         "0.5m": np.sum(acc_record < 0.5) / acc_record.shape[0],
         "0.1m": np.sum(acc_record < 0.1) / acc_record.shape[0],
@@ -40,7 +37,7 @@ def create_combined_results_table(combined_recalls, results_dir):
     png_table_file = os.path.join(results_dir, "combined_results_table.png")
 
     # Collect recall keys
-    recall_keys = ["10m", "3m", "2m", "1m", "0.5m", "0.1m", "1m 30 deg"]
+    recall_keys = ["0.1m","0.5m","1m","1m 30 deg"]
 
     # Prepare a dictionary to store the best score for each recall type
     best_scores = {key: -1 for key in recall_keys}
@@ -57,7 +54,7 @@ def create_combined_results_table(combined_recalls, results_dir):
 
     # Generate the text-based table
     with open(table_file, "w") as f:
-        f.write("Stage\t10m\t3m\t2m\t1m\t0.5m\t0.1m\t1m 30 deg\n")
+        f.write("Stage\t0.1m\t0.5m\t1m\t1m 30 deg\n")
         for stage, recalls in combined_recalls.items():
             f.write(f"{stage}\t")
             f.write("\t".join([f"{recalls[key]:.2f}" for key in recall_keys]))

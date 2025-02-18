@@ -5,7 +5,7 @@ log_dir_depth: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPl
 log_dir_semantic: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/zind/fov_80_correct_scale/semantic/final_semantic_model_checkpoint.ckpt'
 split_file: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/zind_data_set_80_fov/split.yaml'
 prob_vol_path: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/data/zind/prob_vol'
-results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/zind/fov_80_correct_scale/final'
+results_dir: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/results/zind/mask2former_semantics_tiny_50k_gt_test_set/'
 # Dataset parameters
 L: 0
 
@@ -23,19 +23,31 @@ V: 9
 num_classes: 4
 
 use_saved_prob_vol: false
-num_of_scenes: 10
+num_of_scenes: -1
 
 # Evaluation parameters
 prediction_type: 'combined'  # Options: 'depth', 'semantic', 'combined', 'all'
-use_ground_truth_depth: false  # Set to true to use ground truth depth
-use_ground_truth_semantic: false  # Set to true to use ground truth semantics
+use_ground_truth_depth: true  # Set to true to use ground truth depth
+use_ground_truth_semantic: true  # Set to true to use ground truth semantics
 
 # Weight combinations for combined evaluation
 weight_combinations:
-  - [1.0, 0.0]  # Depth-only
-  - [0.0, 1.0]  # Semantic-only
+  - [1.0, 0]  # Only depth
+  - [0.9, 0.1]
+  - [0.8, 0.2]
+  - [0.7, 0.3]
+  - [0.6, 0.4]
   - [0.5, 0.5]
-  # - [0.6, 0.4]
-  # - [0.7, 0.3]
-  # - [0.8, 0.2]
-  # - [0.9, 0.1]
+  - [0.4, 0.6]
+  - [0.3, 0.7]
+  - [0.2, 0.8]
+  - [0.1, 0.9]
+  - [0, 1.0]  # Only Semantic
+
+
+
+log_dir_semantic_maskformer: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/zind/mask2Former_small_50k/semantic/semantic_net-epoch=04-loss-valid=0.47.ckpt'
+use_maskformer: true
+
+log_dir_semantic_maskformer_small: '/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/logs/zind/mask2Former_tiny_50k/semantic/semantic_net-epoch=04-loss-valid=0.49.ckpt'
+use_small_maskformer: true

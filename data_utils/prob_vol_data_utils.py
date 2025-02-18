@@ -12,75 +12,7 @@ K = np.array([[320/np.tan(0.698132), 0, 320],
               [0, 180/np.tan(0.440992), 180],
               [0, 0, 1]], dtype=np.float32)  # Hardcoded intrinsics
 
-def get_gaussian_prob_vol_gt(prob_vol, sigma=6):
-    """
-    Generates a Gaussian distribution centered at the maximum value in the input map.
-    
-    Args:
-        prob_vol (torch.Tensor): Input map of dimensions [H, W].
-        sigma (float): Standard deviation of the Gaussian.
-    
-    Returns:
-        torch.Tensor: Gaussian-distributed map centered at the GT maximum.
-    """
-    H, W = prob_vol.shape
-    device = prob_vol.device
-    
-    # Find the coordinates of the maximum value
-    max_coords = torch.nonzero(prob_vol == torch.max(prob_vol), as_tuple=False)
-    if len(max_coords) > 0:
-        max_y, max_x = max_coords[0].tolist()
-    else:
-        raise ValueError("No maximum value found in the input map.")
-    
-    # Create coordinate grids
-    y_coords = torch.arange(0, H, device=device).unsqueeze(1)
-    x_coords = torch.arange(0, W, device=device).unsqueeze(0)
-    
-    # Calculate Gaussian distribution
-    gaussian = torch.exp(-((x_coords - max_x)**2 + (y_coords - max_y)**2) / (2 * sigma**2))
-    gaussian = gaussian / gaussian.max()  # Normalize to [0, 1]
-    
-    return gaussian
 
-def get_narrow_prob_vol_gt(prob_vol):
-        """
-        Takes a map of dimensions [H, W] and returns a modified map of the same dimensions [H, W],
-        where the max value is set to 1 and a surrounding block with a diameter of 0.5m (radius of 2.5 units)
-        is also set to 1. All other values are zero.
-        
-        Args:
-            prob_vol_semantic_gt (torch.Tensor): Input map of dimensions [H, W].
-        
-        Returns:
-            torch.Tensor: Modified map with a block around the max value set to 1.
-        """
-        # Ensure the input is a 2D tensor
-        assert len(prob_vol.shape) == 2, "Input must be a 2D tensor with dimensions [H, W]"
-
-        # Get the dimensions of the input map
-        H, W = prob_vol.shape
-
-        # Find the coordinates of the maximum value
-        max_coords = torch.nonzero(prob_vol == torch.max(prob_vol), as_tuple=False)
-        if len(max_coords) > 0:
-            max_y, max_x = max_coords[0].tolist()
-        else:
-            raise ValueError("No maximum value found in the input map.")
-
-        # Create a mask with a 0.5m diameter (radius 2.5 units, each unit is 0.1m)
-        radius = 5  # 0.5m / 0.1m per unit
-        mask = torch.zeros_like(prob_vol)
-
-        for i in range(max(0, int(max_y - radius)), min(H, int(max_y + radius) + 1)):
-            for j in range(max(0, int(max_x - radius)), min(W, int(max_x + radius) + 1)):
-                if (i - max_y)**2 + (j - max_x)**2 <= radius**2:
-                    mask[i, j] = 1
-
-        # Apply the mask to the map (setting the specified block to 1)
-        narrow_prob_vol_gt = mask
-
-        return narrow_prob_vol_gt
 class ProbVolDataset(Dataset):
     def __init__(
         self,

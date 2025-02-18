@@ -9,6 +9,8 @@ import torch
 
 from modules.mono.depth_net_pl import depth_net_pl
 from modules.semantic.semantic_net_pl import semantic_net_pl
+from modules.semantic.semantic_net_pl_maskformer import semantic_net_pl_maskformer
+from modules.semantic.semantic_net_pl_maskformer_small import semantic_net_pl_maskformer_small
 from data_utils.data_utils import GridSeqDataset
 from attrdict import AttrDict
 
@@ -21,18 +23,22 @@ def setup_dataset_and_loader(config, dataset_dir, split):
     """Set up dataset and dataloader based on configuration."""
     train_set = GridSeqDataset(
         dataset_dir,
-        split.train,
+        split.train[:-1],
         L=config.depth_net.L,
         roll=config.augmentation.roll,
         pitch=config.augmentation.pitch,
+        augment= config.image_augment,
+        noise_std= config.image_augment_noise_std,
     )
 
     val_set = GridSeqDataset(
         dataset_dir,
-        split.val,
+        split.val[:-1],
         L=config.depth_net.L,
         roll=config.augmentation.roll,
         pitch=config.augmentation.pitch,
+        augment= False,
+        noise_std= 0,
     )
 
     train_loader = DataLoader(train_set, batch_size=config.batch_size, shuffle=True, num_workers=4)
@@ -53,12 +59,26 @@ def initialize_model(config, model_type):
             F_W=config.depth_net.F_W,
         )
     elif model_type == "semantic":
-        model = semantic_net_pl(
-            num_classes=config.num_classes,
-            shape_loss_weight=config.shape_loss_weight,
-            lr=config.lr,    
-            F_W=config.depth_net.F_W,
-        )
+        if config.use_maskformer:
+            if config.use_small:
+                model = semantic_net_pl_maskformer_small(
+                    num_classes=config.num_classes,
+                    lr=config.lr,    
+                    F_W=config.depth_net.F_W,
+                )
+            else:
+                model = semantic_net_pl_maskformer(
+                    num_classes=config.num_classes,
+                    lr=config.lr,    
+                    F_W=config.depth_net.F_W,
+                )
+        else:
+            model = semantic_net_pl(
+                num_classes=config.num_classes,
+                shape_loss_weight=config.shape_loss_weight,
+                lr=config.lr,    
+                F_W=config.depth_net.F_W,
+            )
     return model
 
 def main():
@@ -69,8 +89,8 @@ def main():
         type=str,
         # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/full/semantic_net_config.yaml", #S3D
         # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/full/depth_net_config.yaml", #S3D
-        default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/zind/depth_net_config.yaml", #ZIND
-        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/zind/semantic_net_config.yaml", #ZIND
+        # default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/zind/depth_net_config.yaml", #ZIND
+        default= "/datadrive2/CRM.AI.Research/TeamFolders/Email/repo_yuval/FloorPlan/Semantic_Floor_plan_localization/Train_models/configurations/zind/semantic_net_config.yaml", #ZIND
         help="Path to the config file",
     )
     args = parser.parse_args()
